@@ -1,0 +1,17 @@
+/* LeafletFix.css */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  background: #f8fafc;
+}
+
+.leaflet-control-zoom a {
+  background: white !important;
+  color: #374151 !important;
+  border: 1px solid #d1d5db !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1) !important;
+}
