@@ -283,9 +283,8 @@ const MISFlightSchedule = () => {
   const arrivalStatuses = ['Scheduled', 'Arrived', 'Delayed', 'On Time', 'Canceled'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 text-slate-800 p-6">
-      {/* Header */}
-      
+    <div id="MIS" className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 text-slate-800 p-6">
+   
 
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
@@ -381,16 +380,7 @@ const MISFlightSchedule = () => {
                 </div>
               </div>
 
-              {/* Animated progress bar */}
-              <div className="w-full bg-white/50 rounded-full h-1.5 mt-3 overflow-hidden">
-                <div
-                  className={`
-                    h-full bg-gradient-to-r from-${item.color}-400 to-${item.color}-600 
-                    rounded-full transition-all duration-1000 ease-out
-                  `}
-                  style={{ width: `${item.progress}%` }}
-                ></div>
-              </div>
+             
 
               {/* Progress percentage */}
               <div className="text-xs text-slate-500 mt-1 text-right">
@@ -511,8 +501,9 @@ const MISFlightSchedule = () => {
                   "Route",
                   "Date",
                   "Time",
+                  "Type",
                   "Status",
-                  "Arrival",
+                 
                   "Remarks",
                   "Signature",
                   "Actions",
@@ -530,7 +521,7 @@ const MISFlightSchedule = () => {
               {filteredFlights.map((flight, index) => (
                 <tr
                   key={flight.id}
-                  className="hover:bg-sky-50/50 transition-colors duration-200"
+                  className="hover:bg-sky-400/100 transition-colors duration-200"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-900">

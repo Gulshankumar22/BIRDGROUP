@@ -10,7 +10,6 @@ import "chartjs-plugin-datalabels";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MISFlightSchedule from "../pages/MISFlightSchedule";
-import logo from "/BGLOGO.jpg";
 
 // Fix for Leaflet default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -647,46 +646,6 @@ const Home = () => {
     end: "",
   });
 
-  // Enhanced date range filter component
-  <div className="flex-1 min-w-[200px] relative">
-    <input
-      type="text"
-      className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 text-sm cursor-pointer"
-      placeholder="Select date range"
-      value={
-        dateRange.start && dateRange.end
-          ? `${dateRange.start} to ${dateRange.end}`
-          : ""
-      }
-      readOnly
-      onClick={() => {
-        // You can integrate a date range picker library here
-        // For now, we'll use native date inputs for simplicity
-        const startDate = prompt("Enter start date (YYYY-MM-DD):");
-        const endDate = prompt("Enter end date (YYYY-MM-DD):");
-        if (startDate && endDate) {
-          setDateRange({ start: startDate, end: endDate });
-          applyFilters();
-        }
-      }}
-    />
-    <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-      <svg
-        className="w-4 h-4 text-slate-400"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-        />
-      </svg>
-    </div>
-  </div>;
-
   // Ticket Modal State
   const [ticketModalOpen, setTicketModalOpen] = useState(false);
   const [ticketForm, setTicketForm] = useState({
@@ -700,6 +659,7 @@ const Home = () => {
   });
 
   const [showTicketConfirmation, setShowTicketConfirmation] = useState(false);
+  const [ticketHistory, setTicketHistory] = useState([]);
 
   // Refs
   const flightStatusRef = useRef(null);
@@ -836,14 +796,14 @@ const Home = () => {
               statusCounts.Cancelled,
             ],
             backgroundColor: [
-              "rgba(34, 197, 94, 0.8)", // Green
-              "rgba(249, 115, 22, 0.8)", // Orange
-              "rgba(239, 68, 68, 0.8)", // Red
+              "rgba(173, 216, 230, 0.8)", // Light Blue
+              "rgba(144, 238, 144, 0.8)", // Light Green
+              "rgba(255, 182, 193, 0.8)", // Light Pink
             ],
             borderColor: [
-              "rgb(34, 197, 94)",
-              "rgb(249, 115, 22)",
-              "rgb(239, 68, 68)",
+              "rgb(135, 206, 235)", // Sky Blue
+              "rgb(124, 252, 124)", // Lime Green
+              "rgb(255, 105, 180)", // Hot Pink
             ],
             borderWidth: 3,
             hoverOffset: 20,
@@ -1021,23 +981,10 @@ const Home = () => {
         performanceChartRef.current = null;
       }
 
-      const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      const onTimeData = [85, 78, 92, 88, 76, 95, 89, 93, 87, 91, 86, 94];
-      const delayedData = [10, 15, 5, 8, 18, 3, 7, 4, 9, 6, 11, 4];
-      const cancelledData = [5, 7, 3, 4, 6, 2, 4, 3, 4, 3, 3, 2];
+      const months = ["Aug", "Sep", "Oct", "Nov"];
+      const onTimeData = [85, 78, 92, 88];
+      const delayedData = [10, 15, 5, 8];
+      const cancelledData = [5, 7, 3, 4];
 
       const data = {
         labels: months,
@@ -1703,8 +1650,21 @@ const Home = () => {
       return;
     }
 
+    // Create new ticket object
+    const newTicket = {
+      id: `TKT-${Math.floor(Math.random() * 1000000)
+        .toString()
+        .padStart(6, "0")}`,
+      ...ticketForm,
+      createdAt: new Date().toISOString(),
+      status: "Open",
+    };
+
+    // Add to ticket history
+    setTicketHistory((prev) => [...prev, newTicket]);
+
     // Here you would typically send the data to your backend
-    console.log("Ticket submitted:", ticketForm);
+    console.log("Ticket submitted:", newTicket);
 
     // Close ticket modal and show confirmation popup
     setTicketModalOpen(false);
@@ -1844,11 +1804,11 @@ const Home = () => {
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10  rounded-xl flex items-center justify-center shadow-lg shadow-sky-500/25 overflow-hidden border border-sky-200">
+            <div className="w-10 h-10   flex items-center justify-center ">
               <img
-                src="logo"
+                src="/logo.jpg"
                 alt="BirdGroup Logo"
-                className="w-8 h-8 object-contain"
+                className="w-12 h-12 object-contain"
                 onError={(e) => {
                   // Fallback if image doesn't load
                   e.target.style.display = "none";
@@ -1898,7 +1858,7 @@ const Home = () => {
               <span>Reports</span>
             </a>
             <a
-              href="#dashboard"
+              href="#ticket-history"
               className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
             >
               <div className="w-2 h-2 bg-sky-500 rounded-full" />
@@ -1914,9 +1874,9 @@ const Home = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* RAISE IT TICKET Button */}
+            {/* RAISE IT TICKET Button - Only one button now */}
             <button
-              className="hidden md:inline-block bg-gradient-to-r from-red-500 to-pink-600 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 animate-pulse"
+              className="hidden md:inline-block bg-gradient-to-r from-gray-500 to-gray-900 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all duration-300 hover:scale-105"
               onClick={openTicketModal}
             >
               🎫 RAISE IT TICKET
@@ -1987,14 +1947,20 @@ const Home = () => {
                 Reports
               </a>
               <a
+                href="#ticket-history"
+                className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
+              >
+                Ticket History
+              </a>
+              <a
                 href="#gse"
                 className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
               >
                 GSE
               </a>
-              {/* Mobile RAISE IT TICKET Button */}
+              {/* Mobile RAISE IT TICKET Button - Only one button now */}
               <button
-                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white font-bold shadow-lg shadow-red-500/25"
+                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-gray-500 to-gray-900 text-white font-bold shadow-lg shadow-gray-500/25"
                 onClick={openTicketModal}
               >
                 🎫 RAISE IT TICKET
@@ -2128,17 +2094,6 @@ const Home = () => {
                           </div>
                         </div>
 
-                        {/* Animated progress bar */}
-                        <div className="w-full bg-white/50 rounded-full h-1.5 mt-3 overflow-hidden">
-                          <div
-                            className={`
-                h-full bg-gradient-to-r from-${item.color}-400 to-${item.color}-600 
-                rounded-full transition-all duration-1000 ease-out
-              `}
-                            style={{ width: `${item.progress}%` }}
-                          ></div>
-                        </div>
-
                         {/* Progress percentage */}
                         <div className="text-xs text-slate-500 mt-1 text-right">
                           {item.progress}%
@@ -2154,7 +2109,6 @@ const Home = () => {
                 </div>
               </section>
 
-              {/* Flight Operations */}
               {/* Flight Operations */}
               <section id="flights" className="mb-8">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -2313,7 +2267,7 @@ const Home = () => {
                         {filteredData.map((flight, index) => (
                           <tr
                             key={flight.flightNo}
-                            className="hover:bg-sky-50/50 transition-colors duration-200"
+                            className="hover:bg-sky-400/100 transition-colors duration-200"
                             style={{ animationDelay: `${index * 100}ms` }}
                           >
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-900">
@@ -2381,7 +2335,7 @@ const Home = () => {
               </section>
 
               {/* MIS Section */}
-              <section id="mis" className="mb-8">
+              <section id="MIS" className="mb-8">
                 <div className="mb-8">
                   <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
                     MIS - Flight Schedule Management
@@ -2392,6 +2346,124 @@ const Home = () => {
                   </p>
                 </div>
                 <MISFlightSchedule />
+              </section>
+
+              {/* Ticket History Section */}
+              <section id="ticket-history" className="mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">
+                  Ticket History
+                </h2>
+
+                {ticketHistory.length === 0 ? (
+                  <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl p-8 text-center shadow-lg">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg
+                        className="w-8 h-8 text-gray-400"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">
+                      No Tickets Yet
+                    </h3>
+                    <p className="text-gray-500 mb-4">
+                      Your submitted tickets will appear here
+                    </p>
+                    <button
+                      className="bg-gradient-to-r from-gray-500 to-gray-900 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all duration-300 hover:scale-105"
+                      onClick={openTicketModal}
+                    >
+                      🎫 Create Your First Ticket
+                    </button>
+                  </div>
+                ) : (
+                  <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="min-w-full divide-y divide-slate-200/60">
+                        <thead className="bg-slate-50/80">
+                          <tr>
+                            {[
+                              "Ticket ID",
+                              "Category",
+                              "Subject",
+                              "Priority",
+                              "Status",
+                              "Created Date",
+                              "Actions",
+                            ].map((header) => (
+                              <th
+                                key={header}
+                                className="px-4 sm:px-6 py-4 text-left text-xs font-semibold text-sky-600 uppercase tracking-wider"
+                              >
+                                {header}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-slate-200/40">
+                          {ticketHistory.map((ticket, index) => (
+                            <tr
+                              key={ticket.id}
+                              className="hover:bg-sky-400/100 transition-colors duration-200"
+                              style={{ animationDelay: `${index * 100}ms` }}
+                            >
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-900">
+                                {ticket.id}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                {ticket.category}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                {ticket.subject}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                <span
+                                  className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
+                                    ticket.priority === "High"
+                                      ? "bg-red-100 text-red-800 border border-red-200"
+                                      : ticket.priority === "Medium"
+                                      ? "bg-yellow-100 text-yellow-800 border border-yellow-200"
+                                      : "bg-green-100 text-green-800 border border-green-200"
+                                  }`}
+                                >
+                                  {ticket.priority}
+                                </span>
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800 border border-blue-200">
+                                  {ticket.status}
+                                </span>
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                                {new Date(
+                                  ticket.createdAt
+                                ).toLocaleDateString()}
+                              </td>
+                              <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
+                                <button
+                                  className="bg-sky-500 text-white px-3 sm:px-4 py-1 sm:py-2 rounded-lg font-medium hover:bg-sky-600 transition-colors duration-200 text-sm shadow-sm shadow-sky-500/25"
+                                  onClick={() =>
+                                    alert(`Viewing ticket: ${ticket.id}`)
+                                  }
+                                >
+                                  View
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </section>
 
               {/* Reports & Analytics */}
@@ -2443,23 +2515,6 @@ const Home = () => {
                     </div>
                     <div className="h-72">
                       <canvas ref={performanceRef} />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Coming Soon Section */}
-                <div className="bg-gradient-to-r from-sky-500 to-blue-600 rounded-2xl p-6 text-white shadow-lg">
-                  <div className="flex items-center gap-4">
-                    <div className="text-3xl">🚀</div>
-                    <div>
-                      <h3 className="text-lg font-semibold mb-2">
-                        Advanced Analytics Coming Soon
-                      </h3>
-                      <p className="text-sky-100 text-sm">
-                        More advanced 3D visualizations and predictive analytics
-                        will be available here to provide deeper insights into
-                        your fleet operations.
-                      </p>
                     </div>
                   </div>
                 </div>
@@ -2675,16 +2730,16 @@ const Home = () => {
         >
           <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl transform transition-all duration-300 scale-95 animate-in fade-in-90 slide-in-from-bottom-10">
             {/* Header */}
-            <div className="sticky top-0 bg-gradient-to-r from-red-500 to-pink-600 text-white p-6 rounded-t-2xl">
+            <div className="sticky top-0 bg-gradient-to-r from-gray-500 to-gray-900 text-white p-6 rounded-t-2xl">
               <div className="flex justify-between items-center">
                 <div>
                   <h3 className="text-2xl font-bold">🎫 RAISE IT TICKET</h3>
-                  <p className="text-red-100 mt-1">
+                  <p className="text-gray-100 mt-1">
                     Get immediate assistance from our support team
                   </p>
                 </div>
                 <button
-                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-600 transition-colors duration-200 text-white"
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-600 transition-colors duration-200 text-white"
                   onClick={closeTicketModal}
                 >
                   <svg
@@ -2716,7 +2771,7 @@ const Home = () => {
                   onChange={(e) =>
                     handleTicketInputChange("category", e.target.value)
                   }
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-white"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 bg-white"
                 >
                   <option value="">Select Category</option>
                   <option value="Hardware">Hardware</option>
@@ -2782,7 +2837,7 @@ const Home = () => {
                     handleTicketInputChange("subject", e.target.value)
                   }
                   placeholder="Brief description of the issue"
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200"
                 />
               </div>
 
@@ -2798,7 +2853,7 @@ const Home = () => {
                   }
                   placeholder="Please provide detailed information about the issue..."
                   rows={4}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 resize-none"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 resize-none"
                 />
               </div>
 
@@ -2814,7 +2869,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleTicketInputChange("equipmentId", e.target.value)
                     }
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 bg-white"
                   >
                     <option value="">Select Equipment</option>
                     {equipmentData.map((equipment) => (
@@ -2835,7 +2890,7 @@ const Home = () => {
                     onChange={(e) =>
                       handleTicketInputChange("flightNo", e.target.value)
                     }
-                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200 bg-white"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-gray-500 focus:border-gray-500 transition-all duration-200 bg-white"
                   >
                     <option value="">Select Flight</option>
                     {flightData.map((flight) => (
@@ -2852,7 +2907,7 @@ const Home = () => {
                 <label className="block text-sm font-semibold text-slate-700 mb-2">
                   Attachments (Optional)
                 </label>
-                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-red-400 transition-colors duration-200">
+                <div className="border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:border-gray-400 transition-colors duration-200">
                   <input
                     type="file"
                     onChange={handleFileUpload}
@@ -2898,7 +2953,7 @@ const Home = () => {
                 </button>
                 <button
                   onClick={submitTicket}
-                  className="flex-1 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-xl font-bold shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-200 hover:scale-105"
+                  className="flex-1 px-6 py-3 bg-gradient-to-r from-gray-500 to-gray-900 text-white rounded-xl font-bold shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all duration-200 hover:scale-105"
                 >
                   🎫 SUBMIT TICKET
                 </button>
