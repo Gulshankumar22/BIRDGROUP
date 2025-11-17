@@ -1,13 +1,13 @@
 // MISFlightSchedule.jsx
 import React, { useState, useMemo } from 'react';
-import { Search, Filter, Calendar, Plane, XCircle, CheckCircle, Download, Edit, Save, Plus } from 'lucide-react';
+import { Search, Filter, Calendar, Plane, XCircle, CheckCircle, Download, Edit, Save, Plus, Upload, X, FileText, Image } from 'lucide-react';
 
 const MISFlightSchedule = () => {
   const [filters, setFilters] = useState({
     search: '',
     station: 'All Stations',
     airline: 'All Airlines',
-    status: 'All Statuses',
+    status: 'All Status',
     dateRange: ''
   });
 
@@ -23,8 +23,14 @@ const MISFlightSchedule = () => {
     arrival: 'Scheduled',
     description: '',
     personName: '',
-    actionType: 'edit' // 'edit', 'cancel', 'add'
+    actionType: 'edit', // 'edit', 'cancel', 'add'
+    // Media upload fields
+    mediaFiles: [],
+    mediaUrls: [],
+    mediaDescriptions: []
   });
+
+  const [uploading, setUploading] = useState(false);
 
   // Sample flight data - you can replace this with API data
   const [flightsData, setFlightsData] = useState([
@@ -38,7 +44,8 @@ const MISFlightSchedule = () => {
       status: 'Scheduled',
       arrival: 'Arrived',
       remarks: '-',
-      signature: '-'
+      signature: '-',
+      mediaFiles: []
     },
     {
       id: 2,
@@ -50,7 +57,8 @@ const MISFlightSchedule = () => {
       status: 'Scheduled',
       arrival: 'Delayed',
       remarks: '-',
-      signature: '-'
+      signature: '-',
+      mediaFiles: []
     },
     {
       id: 3,
@@ -62,7 +70,16 @@ const MISFlightSchedule = () => {
       status: 'Canceled',
       arrival: 'Canceled',
       remarks: 'Aircraft maintenance required',
-      signature: 'John Doe'
+      signature: 'John Doe',
+      mediaFiles: [
+        {
+          id: 1,
+          name: 'maintenance_report.pdf',
+          type: 'document',
+          url: '#',
+          uploadedAt: '2025-11-11T08:00:00Z'
+        }
+      ]
     },
     {
       id: 4,
@@ -74,7 +91,8 @@ const MISFlightSchedule = () => {
       status: 'Scheduled',
       arrival: 'Arrived',
       remarks: '-',
-      signature: '-'
+      signature: '-',
+      mediaFiles: []
     },
     {
       id: 5,
@@ -86,7 +104,8 @@ const MISFlightSchedule = () => {
       status: 'Scheduled',
       arrival: 'On Time',
       remarks: '-',
-      signature: '-'
+      signature: '-',
+      mediaFiles: []
     }
   ]);
 
@@ -111,7 +130,7 @@ const MISFlightSchedule = () => {
         flight.route.toLowerCase().includes(filters.search.toLowerCase());
       
       const matchesAirline = filters.airline === 'All Airlines' || flight.airline === filters.airline;
-      const matchesStatus = filters.status === 'All Statuses' || flight.status === filters.status;
+      const matchesStatus = filters.status === 'All Status' || flight.status === filters.status;
       
       return matchesSearch && matchesAirline && matchesStatus;
     });
@@ -133,7 +152,10 @@ const MISFlightSchedule = () => {
       arrival: 'Scheduled',
       description: '',
       personName: '',
-      actionType: 'add'
+      actionType: 'add',
+      mediaFiles: [],
+      mediaUrls: [],
+      mediaDescriptions: []
     });
     setShowFlightForm(true);
   };
@@ -150,7 +172,10 @@ const MISFlightSchedule = () => {
       arrival: flight.arrival,
       description: flight.remarks !== '-' ? flight.remarks : '',
       personName: flight.signature !== '-' ? flight.signature : '',
-      actionType: 'edit'
+      actionType: 'edit',
+      mediaFiles: flight.mediaFiles || [],
+      mediaUrls: flight.mediaFiles?.map(f => f.url) || [],
+      mediaDescriptions: []
     });
     setShowFlightForm(true);
   };
@@ -167,9 +192,64 @@ const MISFlightSchedule = () => {
       arrival: flight.arrival,
       description: flight.remarks !== '-' ? flight.remarks : '',
       personName: flight.signature !== '-' ? flight.signature : '',
-      actionType: 'cancel'
+      actionType: 'cancel',
+      // Initialize media upload fields
+      mediaFiles: [],
+      mediaUrls: [],
+      mediaDescriptions: []
     });
     setShowFlightForm(true);
+  };
+
+  // Handle file upload
+  const handleFileUpload = async (event) => {
+    const files = Array.from(event.target.files);
+    if (files.length === 0) return;
+
+    setUploading(true);
+    
+    try {
+      // Simulate file upload - replace with actual API call
+      const uploadPromises = files.map(async (file) => {
+        // Simulate upload delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        return {
+          id: Date.now() + Math.random(),
+          file,
+          name: file.name,
+          type: file.type.startsWith('image/') ? 'image' : 'document',
+          size: file.size,
+          url: URL.createObjectURL(file), // For preview
+          uploadedAt: new Date().toISOString(),
+        };
+      });
+      
+      const uploadedFiles = await Promise.all(uploadPromises);
+      
+      // Update form state with new files
+      setFlightForm(prev => ({
+        ...prev,
+        mediaFiles: [...prev.mediaFiles, ...uploadedFiles],
+        mediaUrls: [...prev.mediaUrls, ...uploadedFiles.map(f => f.url)],
+      }));
+      
+    } catch (error) {
+      console.error('Upload failed:', error);
+      alert('File upload failed. Please try again.');
+    } finally {
+      setUploading(false);
+      // Reset file input
+      event.target.value = '';
+    }
+  };
+
+  const handleRemoveMedia = (index) => {
+    setFlightForm(prev => ({
+      ...prev,
+      mediaFiles: prev.mediaFiles.filter((_, i) => i !== index),
+      mediaUrls: prev.mediaUrls.filter((_, i) => i !== index),
+    }));
   };
 
   const handleSaveFlightDetails = () => {
@@ -185,7 +265,8 @@ const MISFlightSchedule = () => {
         status: flightForm.status,
         arrival: flightForm.arrival,
         remarks: flightForm.description || '-',
-        signature: flightForm.personName || '-'
+        signature: flightForm.personName || '-',
+        mediaFiles: flightForm.mediaFiles
       };
 
       setFlightsData(prev => [...prev, newFlight]);
@@ -204,7 +285,8 @@ const MISFlightSchedule = () => {
             status: flightForm.status,
             arrival: flightForm.arrival,
             remarks: flightForm.description || '-',
-            signature: flightForm.personName || '-'
+            signature: flightForm.personName || '-',
+            mediaFiles: flightForm.mediaFiles
           };
 
           // If action type is cancel, update status and arrival
@@ -240,7 +322,10 @@ const MISFlightSchedule = () => {
       arrival: 'Scheduled',
       description: '', 
       personName: '', 
-      actionType: 'edit' 
+      actionType: 'edit',
+      mediaFiles: [],
+      mediaUrls: [],
+      mediaDescriptions: []
     });
   };
 
@@ -279,19 +364,17 @@ const MISFlightSchedule = () => {
 
   const stations = ['All Stations', 'DEL', 'BOM', 'BLR', 'MAA', 'HYD', 'CCU', 'GOI'];
   const airlines = ['All Airlines', 'Air India', 'IndiGo', 'SpiceJet', 'Vistara', 'Go First'];
-  const statuses = ['All Statuses', 'Scheduled', 'Canceled'];
+  const statuses = ['All Status', 'Scheduled', 'Canceled'];
   const arrivalStatuses = ['Scheduled', 'Arrived', 'Delayed', 'On Time', 'Canceled'];
 
   return (
-    <div id="MIS" className="min-h-screen bg-gradient-to-br from-sky-50 via-blue-50 to-cyan-50 text-slate-800 p-6">
-   
-
+    <div id="MIS" className="min-h-screen  p-6">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {[
           {
             value: stats.totalFlights,
-            label: "Total Flights",
+            label: "Scheduled Flights",
             icon: "✈️",
             description: "Active flights in system",
             color: "sky",
@@ -301,7 +384,7 @@ const MISFlightSchedule = () => {
           },
           {
             value: stats.scheduled,
-            label: "Scheduled",
+            label: "Non-Scheduled Flights",
             icon: "⏱️",
             description: "On-time flights",
             color: "emerald",
@@ -311,7 +394,7 @@ const MISFlightSchedule = () => {
           },
           {
             value: stats.canceled,
-            label: "Canceled",
+            label: "Canceled Flights",
             icon: "❌",
             description: "Cancelled flights",
             color: "red",
@@ -321,9 +404,9 @@ const MISFlightSchedule = () => {
           },
           {
             value: stats.additionalFlights,
-            label: "Additional Flights",
+            label: "Delayed Flights",
             icon: "📊",
-            description: "Delayed & on-time",
+            description: "Delayed",
             color: "violet",
             bgGradient: "from-violet-50 to-purple-50",
             hoverGradient: "from-violet-100 to-purple-100",
@@ -380,8 +463,6 @@ const MISFlightSchedule = () => {
                 </div>
               </div>
 
-             
-
               {/* Progress percentage */}
               <div className="text-xs text-slate-500 mt-1 text-right">
                 {item.progress}%
@@ -392,7 +473,7 @@ const MISFlightSchedule = () => {
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-lg mb-6">
+      <div className="bg-white backdrop-blur-md border border-white/50 rounded-2xl shadow-lg mb-6">
         <div className="p-6 border-b border-white/50 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
@@ -413,7 +494,7 @@ const MISFlightSchedule = () => {
             </button>
             <button
               onClick={handleExportData}
-              className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 hover:scale-105"
+              className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105"
             >
               <Download className="h-4 w-4" />
               Export CSV
@@ -468,29 +549,11 @@ const MISFlightSchedule = () => {
           </select>
 
           {/* Date Range Filter */}
-          <div className="relative">
-            <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Select date range..."
-              className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 bg-white/50 backdrop-blur-sm cursor-pointer"
-              value={filters.dateRange}
-              onChange={(e) => handleFilterChange('dateRange', e.target.value)}
-              onFocus={(e) => {
-                e.target.type = 'date';
-              }}
-              onBlur={(e) => {
-                if (!e.target.value) {
-                  e.target.type = 'text';
-                }
-              }}
-            />
-          </div>
         </div>
       </div>
 
       {/* Flights Table */}
-      <div className="bg-white/80 backdrop-blur-md border border-white/50 rounded-2xl shadow-lg overflow-hidden">
+      <div className="bg-white backdrop-blur-md border border-white/50 rounded-2xl shadow-lg overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200/60">
             <thead className="bg-slate-50/80">
@@ -503,7 +566,6 @@ const MISFlightSchedule = () => {
                   "Time",
                   "Type",
                   "Status",
-                 
                   "Remarks",
                   "Signature",
                   "Actions",
@@ -605,7 +667,7 @@ const MISFlightSchedule = () => {
       {/* Flight Details Form Modal */}
       {showFlightForm && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
-          <div className="bg-white/90 backdrop-blur-md border border-white/50 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 animate-in fade-in-90 slide-in-from-bottom-10">
+          <div className="bg-white/90 backdrop-blur-md border border-white/50 rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 animate-in fade-in-90 slide-in-from-bottom-10">
             <div className="p-6 border-b border-white/50">
               <h3 className="text-xl font-semibold text-sky-600">
                 {flightForm.actionType === 'add' ? 'Add New Flight' : 
@@ -627,7 +689,7 @@ const MISFlightSchedule = () => {
                     <span className="font-semibold">You are about to cancel this flight</span>
                   </div>
                   <p className="text-sm text-red-700 mt-1">
-                    This action will mark the flight as canceled. Please provide details below.
+                    This action will mark the flight as canceled. Please provide details and supporting documents below.
                   </p>
                 </div>
               )}
@@ -784,6 +846,76 @@ const MISFlightSchedule = () => {
                   required={flightForm.actionType === 'cancel' || flightForm.actionType === 'add'}
                 />
               </div>
+
+              {/* Media Upload Section - Only show for cancel action */}
+              {flightForm.actionType === 'cancel' && (
+                <div className="media-upload-section border border-slate-200 rounded-xl p-6 bg-white/50 backdrop-blur-sm">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Upload className="h-5 w-5 text-sky-600" />
+                    <h4 className="text-lg font-semibold text-slate-700">Upload Supporting Documents</h4>
+                  </div>
+                  
+                  <p className="text-sm text-slate-600 mb-4">
+                    Upload photos, documents, or other files related to the flight cancellation (optional)
+                  </p>
+
+                  {/* Upload Area */}
+                  <div className="upload-area relative border-2 border-dashed border-slate-300 rounded-xl p-8 text-center hover:border-sky-400 transition-colors duration-200 mb-6">
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*,.pdf,.doc,.docx,.txt"
+                      onChange={handleFileUpload}
+                      disabled={uploading}
+                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                    />
+                    <div className="flex flex-col items-center justify-center">
+                      <Upload className="h-8 w-8 text-slate-400 mb-2" />
+                      <p className="text-sm text-slate-600 mb-1">
+                        {uploading ? 'Uploading files...' : 'Click to select files or drag and drop'}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        Supports images, PDF, Word documents (Max 10MB per file)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Media Preview */}
+                  {flightForm.mediaFiles.length > 0 && (
+                    <div className="media-preview">
+                      <h5 className="text-sm font-medium text-slate-700 mb-3">Uploaded Files:</h5>
+                      <div className="space-y-3">
+                        {flightForm.mediaFiles.map((file, index) => (
+                          <div key={file.id} className="media-item flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200">
+                            <div className="flex items-center gap-3">
+                              {file.type === 'image' ? (
+                                <Image className="h-8 w-8 text-blue-500" />
+                              ) : (
+                                <FileText className="h-8 w-8 text-green-500" />
+                              )}
+                              <div className="media-info">
+                                <div className="file-name text-sm font-medium text-slate-700">
+                                  {file.name}
+                                </div>
+                                <div className="file-size text-xs text-slate-500">
+                                  {(file.size / 1024 / 1024).toFixed(2)} MB
+                                </div>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveMedia(index)}
+                              className="remove-media-btn p-1 text-slate-400 hover:text-red-500 transition-colors duration-200"
+                            >
+                              <X className="h-4 w-4" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="p-6 border-t border-white/50 bg-slate-50/80 backdrop-blur-sm rounded-b-2xl flex justify-end space-x-3">
@@ -804,12 +936,22 @@ const MISFlightSchedule = () => {
                 } hover:scale-105`}
                 disabled={
                   flightForm.actionType === 'cancel' && (!flightForm.description || !flightForm.personName) ||
-                  flightForm.actionType === 'add' && (!flightForm.flightNo || !flightForm.airline || !flightForm.route || !flightForm.date || !flightForm.time || !flightForm.personName)
+                  flightForm.actionType === 'add' && (!flightForm.flightNo || !flightForm.airline || !flightForm.route || !flightForm.date || !flightForm.time || !flightForm.personName) ||
+                  uploading
                 }
               >
-                <Save className="h-4 w-4" />
-                {flightForm.actionType === 'add' ? 'Add Flight' : 
-                 flightForm.actionType === 'cancel' ? 'Confirm Cancellation' : 'Save Changes'}
+                {uploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Uploading...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-4 w-4" />
+                    {flightForm.actionType === 'add' ? 'Add Flight' : 
+                     flightForm.actionType === 'cancel' ? 'Confirm Cancellation' : 'Save Changes'}
+                  </>
+                )}
               </button>
             </div>
           </div>

@@ -47,7 +47,7 @@ const createAirportIcon = (color, code) => {
 };
 
 const AirportLogin = () => {
-  const [mapLoaded, setMapLoaded] = useState(false);
+  const [mapLoaded, setMapLoaded] = useState(true);
 
   useEffect(() => {
     const timer = setTimeout(() => setMapLoaded(true), 100);
