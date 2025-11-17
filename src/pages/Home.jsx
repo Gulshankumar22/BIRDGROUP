@@ -2162,7 +2162,7 @@ const Home = () => {
               {
                 value: `${kpis.fuelEfficiency}%`,
                 label: "Staff On Ground",
-                icon: "⛽",
+                icon: "🧍",
                 description: "Staff Record",
                 color: "amber",
                 bgGradient: "from-amber-50 to-yellow-50",
