@@ -394,7 +394,7 @@ const MISFlightSchedule = () => {
           },
           {
             value: stats.canceled,
-            label: "Canceled Flights",
+            label: "Cancelled Flights",
             icon: "❌",
             description: "Cancelled flights",
             color: "red",

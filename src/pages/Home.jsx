@@ -3070,6 +3070,7 @@ const Home = () => {
         onClose={handleCloseConfirmation}
         onRaiseAnother={handleRaiseAnotherTicket}
       />
+      
 
       <style jsx>{`
         @keyframes float {
@@ -3112,6 +3113,16 @@ const Home = () => {
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
         }
       `}</style>
+      {/* Add this at the end of your component, before the closing </div> */}
+      <footer className="bg-white py-4 mt-8 border-t border-gray-200">
+        <div className="container mx-auto px-6">
+          <div className="text-center">
+            <p className="text-gray-600 text-sm font-medium">
+              &copy; {new Date().getFullYear()} All rights reserved by Bird Group Pvt Ltd
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
