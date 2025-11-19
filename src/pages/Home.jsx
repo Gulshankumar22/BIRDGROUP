@@ -729,12 +729,12 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
       
       {/* Sidebar */}
       <div className={`
-        fixed lg:sticky lg:top-20 h-[calc(100vh-5rem)] lg:h-auto w-80 bg-white/95 backdrop-blur-md 
-        border-l border-gray-200/50 z-50 transform transition-transform duration-300
+        fixed lg:sticky lg:top-20 h-[calc(100vh-5rem)] lg:h-auto w-80 bg-white/95 backdrop-blur-md rounded-xl
+        border-l border-gray-200/50 z-10 transform transition-transform duration-300
         ${isOpen ? 'translate-x-0' : 'translate-x-full'}
         lg:translate-x-0 lg:relative lg:w-64 lg:block
       `}>
-        <div className="p-6 h-full flex flex-col">
+        <div className="p-4 h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-800">Date Filter</h3>
@@ -749,7 +749,7 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
           </div>
 
           {/* Selected Dates */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-2 mb-6">
             <div className="space-y-2">
               <div>
                 <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">From</label>

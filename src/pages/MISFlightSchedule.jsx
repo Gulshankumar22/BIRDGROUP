@@ -368,7 +368,7 @@ const MISFlightSchedule = () => {
   const arrivalStatuses = ['Scheduled', 'Arrived', 'Delayed', 'On Time', 'Canceled'];
 
   return (
-    <div id="MIS" className="min-h-screen  p-6">
+    <div id="MIS" className="min-h-screen  ">
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         {[
