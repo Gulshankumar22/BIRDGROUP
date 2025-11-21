@@ -10,6 +10,8 @@ import "chartjs-plugin-datalabels";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MISFlightSchedule from "../pages/MISFlightSchedule";
+import { utils, writeFile } from 'xlsx';
+import { FaFileExcel } from "react-icons/fa";
 
 // Fix for Leaflet default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -26,55 +28,55 @@ L.Icon.Default.mergeOptions({
 const FLIGHT_DATA = [
   {
     flightNo: "AF101",
-    route: "DEL-BOM",
+    route: "DEL-BOM-DEL",
     aircraft: "A320",
     arrival: "10:30",
     departure: "08:45",
-    date: "2024-01-15",
+    date: "2025-11-15",
     scheduled: true,
     nonScheduled: false,
     status: "Active",
   },
   {
     flightNo: "AF202",
-    route: "BOM-BLR",
+    route: "BOM-BLR-BOM",
     aircraft: "B737",
     arrival: "14:15",
     departure: "12:30",
-    date: "2024-01-16",
+    date: "2025-11-16",
     scheduled: true,
     nonScheduled: false,
     status: "Delayed",
   },
   {
     flightNo: "AF303",
-    route: "BLR-HYD",
+    route: "BLR-HYD-BLR",
     aircraft: "A321",
     arrival: "16:45",
     departure: "15:00",
-    date: "2024-01-17",
+    date: "2025-11-17",
     scheduled: false,
     nonScheduled: true,
     status: "Active",
   },
   {
     flightNo: "AF404",
-    route: "DEL-GOA",
+    route: "DEL-GOA-DEL",
     aircraft: "A320",
     arrival: "18:30",
     departure: "16:15",
-    date: "2024-01-18",
+    date: "2025-11-18",
     scheduled: true,
     nonScheduled: false,
     status: "Cancelled",
   },
   {
     flightNo: "AF505",
-    route: "BOM-BLR",
+    route: "BOM-BLR-BOM",
     aircraft: "B737",
     arrival: "20:00",
     departure: "18:45",
-    date: "2024-01-19",
+    date: "2025-11-19",
     scheduled: true,
     nonScheduled: false,
     status: "Active",
@@ -298,7 +300,8 @@ const TicketConfirmationPopup = ({ isOpen, onClose, onRaiseAnother }) => {
             Ticket Raised Successfully!
           </h3>
           <p className="text-gray-600">
-            Your support ticket has been submitted and will be processed shortly.
+            Your support ticket has been submitted and will be processed
+            shortly.
           </p>
         </div>
 
@@ -315,7 +318,9 @@ const TicketConfirmationPopup = ({ isOpen, onClose, onRaiseAnother }) => {
         </div>
 
         <div className="mb-6">
-          <h4 className="font-semibold text-gray-900 mb-3">What happens next?</h4>
+          <h4 className="font-semibold text-gray-900 mb-3">
+            What happens next?
+          </h4>
           <ul className="space-y-2 text-sm text-gray-600">
             <li className="flex items-center">
               <svg
@@ -605,11 +610,17 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
 
 // Calendar Sidebar Component
 // Calendar Sidebar Component
-const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilters }) => {
+const CalendarSidebar = ({
+  isOpen,
+  onClose,
+  dateRange,
+  setDateRange,
+  applyFilters,
+}) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  
+
   const navigateMonth = (direction) => {
-    setCurrentMonth(prev => {
+    setCurrentMonth((prev) => {
       const newMonth = new Date(prev);
       newMonth.setMonth(prev.getMonth() + direction);
       return newMonth;
@@ -622,44 +633,44 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    
+
     return {
       firstDay,
       lastDay,
       daysInMonth,
-      startingDay: firstDay.getDay()
+      startingDay: firstDay.getDay(),
     };
   };
 
   const isDateInRange = (date) => {
     if (!dateRange.start || !dateRange.end) return false;
-    
+
     const currentDate = new Date(date);
     const startDate = new Date(dateRange.start);
     const endDate = new Date(dateRange.end);
-    
+
     return currentDate >= startDate && currentDate <= endDate;
   };
 
   const handleDateClick = (date) => {
-    const dateString = date.toISOString().split('T')[0];
-    
+    const dateString = date.toISOString().split("T")[0];
+
     if (!dateRange.start || (dateRange.start && dateRange.end)) {
       setDateRange({
         start: dateString,
-        end: ""
+        end: "",
       });
     } else {
       const startDate = new Date(dateRange.start);
       if (date < startDate) {
         setDateRange({
           start: dateString,
-          end: dateRange.start
+          end: dateRange.start,
         });
       } else {
-        setDateRange(prev => ({
+        setDateRange((prev) => ({
           ...prev,
-          end: dateString
+          end: dateString,
         }));
       }
     }
@@ -677,7 +688,8 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
     applyFilters();
   };
 
-  const { firstDay, lastDay, daysInMonth, startingDay } = getDaysInMonth(currentMonth);
+  const { firstDay, lastDay, daysInMonth, startingDay } =
+    getDaysInMonth(currentMonth);
   const days = [];
 
   for (let i = 0; i < startingDay; i++) {
@@ -685,28 +697,33 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
   }
 
   for (let day = 1; day <= daysInMonth; day++) {
-    const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    const dateString = date.toISOString().split('T')[0];
+    const date = new Date(
+      currentMonth.getFullYear(),
+      currentMonth.getMonth(),
+      day
+    );
+    const dateString = date.toISOString().split("T")[0];
     const isStart = dateString === dateRange.start;
     const isEnd = dateString === dateRange.end;
     const inRange = isDateInRange(date);
-    const isToday = dateString === new Date().toISOString().split('T')[0];
-    
+    const isToday = dateString === new Date().toISOString().split("T")[0];
+
     days.push(
       <button
         key={day}
         onClick={() => handleDateClick(date)}
         className={`
           relative w-8 h-8 rounded-lg text-sm font-medium transition-all duration-200
-          ${isStart || isEnd 
-            ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-110' 
-            : inRange 
-            ? 'bg-blue-100 text-blue-700' 
-            : isToday
-            ? 'bg-orange-100 text-orange-700 border border-orange-300'
-            : 'text-gray-700 hover:bg-gray-100'
+          ${
+            isStart || isEnd
+              ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-110"
+              : inRange
+              ? "bg-blue-100 text-blue-700"
+              : isToday
+              ? "bg-orange-100 text-orange-700 border border-orange-300"
+              : "text-gray-700 hover:bg-gray-100"
           }
-          ${(isStart || isEnd) && 'ring-2 ring-white ring-opacity-50'}
+          ${(isStart || isEnd) && "ring-2 ring-white ring-opacity-50"}
         `}
       >
         {day}
@@ -721,19 +738,21 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
     <>
       {/* Mobile Backdrop */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={onClose}
         />
       )}
-      
+
       {/* Sidebar */}
-      <div className={`
+      <div
+        className={`
         fixed lg:sticky lg:top-20 h-[calc(100vh-5rem)] lg:h-auto w-80 bg-white/95 backdrop-blur-md rounded-xl
         border-l border-gray-200/50 z-10 transform transition-transform duration-300
-        ${isOpen ? 'translate-x-0' : 'translate-x-full'}
+        ${isOpen ? "translate-x-0" : "translate-x-full"}
         lg:translate-x-0 lg:relative lg:w-64 lg:block
-      `}>
+      `}
+      >
         <div className="p-4 h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between mb-6">
@@ -742,8 +761,18 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
               onClick={onClose}
               className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
             >
-              <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              <svg
+                className="w-5 h-5 text-gray-500"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
               </svg>
             </button>
           </div>
@@ -752,15 +781,23 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
           <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-2 mb-6">
             <div className="space-y-2">
               <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">From</label>
+                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  From
+                </label>
                 <div className="text-sm font-medium text-gray-800">
-                  {dateRange.start ? new Date(dateRange.start).toLocaleDateString() : 'Select start date'}
+                  {dateRange.start
+                    ? new Date(dateRange.start).toLocaleDateString()
+                    : "Select start date"}
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">To</label>
+                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
+                  To
+                </label>
                 <div className="text-sm font-medium text-gray-800">
-                  {dateRange.end ? new Date(dateRange.end).toLocaleDateString() : 'Select end date'}
+                  {dateRange.end
+                    ? new Date(dateRange.end).toLocaleDateString()
+                    : "Select end date"}
                 </div>
               </div>
             </div>
@@ -774,38 +811,62 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
                 onClick={() => navigateMonth(-1)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
               >
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M15 19l-7-7 7-7"
+                  />
                 </svg>
               </button>
-              
+
               <h4 className="text-sm font-bold text-gray-800">
-                {currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                {currentMonth.toLocaleDateString("en-US", {
+                  month: "long",
+                  year: "numeric",
+                })}
               </h4>
-              
+
               <button
                 onClick={() => navigateMonth(1)}
                 className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
               >
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                <svg
+                  className="w-4 h-4 text-gray-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
+                  />
                 </svg>
               </button>
             </div>
 
             {/* Day Headers */}
             <div className="grid grid-cols-7 gap-1 mb-2">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(day => (
-                <div key={day} className="text-xs font-semibold text-gray-500 text-center py-1">
+              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                <div
+                  key={day}
+                  className="text-xs font-semibold text-gray-500 text-center py-1"
+                >
                   {day}
                 </div>
               ))}
             </div>
 
             {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">
-              {days}
-            </div>
+            <div className="grid grid-cols-7 gap-1">{days}</div>
           </div>
 
           {/* Action Buttons */}
@@ -817,7 +878,7 @@ const CalendarSidebar = ({ isOpen, onClose, dateRange, setDateRange, applyFilter
             >
               Apply Filter
             </button>
-            
+
             <button
               onClick={clearDates}
               className="w-full border border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200"
@@ -837,8 +898,9 @@ const Home = () => {
   const [userData, setUserData] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [filteredData, setFilteredData] = useState(FLIGHT_DATA);
-  const [currentChartType, setCurrentChartType] = useState("pie");
-  const [lineChartType, setLineChartType] = useState("line");
+  const [currentChartType, setCurrentChartType] = useState("bar");
+  const [selectedQuarter, setSelectedQuarter] = useState("q1");
+  const [lineChartType, setLineChartType] = useState("bar");
   const [kpis, setKpis] = useState({
     totalFlights: 0,
     activePassengers: 0,
@@ -855,7 +917,9 @@ const Home = () => {
   });
   const [modalOpen, setModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState("Login Demo");
-  const [modalMessage, setModalMessage] = useState("This is a demo login interface.");
+  const [modalMessage, setModalMessage] = useState(
+    "This is a demo login interface."
+  );
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [dateRange, setDateRange] = useState({
@@ -1019,7 +1083,8 @@ const Home = () => {
             ],
             borderWidth: 3,
             hoverOffset: 20,
-            ...((currentChartType === "pie" || currentChartType === "doughnut") && {
+            ...((currentChartType === "bar" ||
+              currentChartType === "doughnut") && {
               spacing: 2,
               offset: [10, 10, 10],
             }),
@@ -1074,25 +1139,6 @@ const Home = () => {
           duration: 2000,
           easing: "easeOutQuart",
         },
-        ...(currentChartType === "pie" && {
-          animation: {
-            animateRotate: true,
-            animateScale: true,
-            duration: 1800,
-            easing: "easeOutBack",
-          },
-          cutout: "0%",
-        }),
-        ...(currentChartType === "doughnut" && {
-          animation: {
-            animateRotate: true,
-            animateScale: true,
-            duration: 2000,
-            easing: "easeOutElastic",
-          },
-          cutout: "50%",
-          radius: "90%",
-        }),
         ...(currentChartType === "bar" && {
           animation: {
             duration: 1500,
@@ -1124,6 +1170,25 @@ const Home = () => {
             },
           },
         }),
+        ...(currentChartType === "pie" && {
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1800,
+            easing: "easeOutBack",
+          },
+          cutout: "0%",
+        }),
+        ...(currentChartType === "doughnut" && {
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 2000,
+            easing: "easeOutElastic",
+          },
+          cutout: "50%",
+          radius: "90%",
+        }),
       };
 
       flightStatusChartRef.current = new Chart(ctx, {
@@ -1153,55 +1218,92 @@ const Home = () => {
         performanceChartRef.current = null;
       }
 
-      const months = ["Aug", "Sep", "Oct", "Nov"];
-      const onTimeData = [85, 78, 92, 88];
-      const delayedData = [10, 15, 5, 8];
-      const cancelledData = [5, 7, 3, 4];
+      // Quarterly data for the entire year
+      const quarterlyData = {
+        q1: {
+          months: ["Jan", "Feb", "Mar"],
+          onTimeData: [82, 85, 88],
+          delayedData: [12, 10, 8],
+          cancelledData: [6, 5, 4],
+        },
+        q2: {
+          months: ["Apr", "May", "Jun"],
+          onTimeData: [86, 90, 87],
+          delayedData: [9, 6, 8],
+          cancelledData: [5, 4, 5],
+        },
+        q3: {
+          months: ["Jul", "Aug", "Sep"],
+          onTimeData: [89, 85, 92],
+          delayedData: [7, 10, 5],
+          cancelledData: [4, 5, 3],
+        },
+        q4: {
+          months: ["Oct", "Nov", "Dec"],
+          onTimeData: [91, 88, 94],
+          delayedData: [6, 8, 4],
+          cancelledData: [3, 4, 2],
+        },
+      };
+
+      const currentQuarter = quarterlyData[selectedQuarter];
 
       const data = {
-        labels: months,
+        labels: currentQuarter.months,
         datasets: [
           {
             label: "On Time",
-            data: onTimeData,
-            borderColor: "rgb(34, 197, 94)",
-            backgroundColor: "rgba(34, 197, 94, 0.2)",
+            data: currentQuarter.onTimeData,
+            borderColor: "rgba(8, 126, 236, 1)",
+            backgroundColor:
+              lineChartType === "bar"
+                ? "rgba(115, 180, 226, 0.8)"
+                : "rgba(34, 140, 197, 0.2)",
             borderWidth: 3,
             tension: 0.4,
-            fill: true,
-            pointBackgroundColor: "rgb(34, 197, 94)",
+            fill: lineChartType !== "bar",
+            pointBackgroundColor: "rgba(34, 69, 197, 1)",
             pointBorderColor: "#fff",
             pointBorderWidth: 2,
             pointRadius: 5,
             pointHoverRadius: 8,
+            borderRadius: lineChartType === "bar" ? 4 : 0,
           },
           {
             label: "Delayed",
-            data: delayedData,
+            data: currentQuarter.delayedData,
             borderColor: "rgb(249, 115, 22)",
-            backgroundColor: "rgba(249, 115, 22, 0.2)",
+            backgroundColor:
+              lineChartType === "bar"
+                ? "rgba(232, 156, 102, 1)"
+                : "rgba(249, 115, 22, 0.2)",
             borderWidth: 3,
             tension: 0.4,
-            fill: true,
+            fill: lineChartType !== "bar",
             pointBackgroundColor: "rgb(249, 115, 22)",
             pointBorderColor: "#fff",
             pointBorderWidth: 2,
             pointRadius: 5,
             pointHoverRadius: 8,
+            borderRadius: lineChartType === "bar" ? 4 : 0,
           },
           {
             label: "Cancelled",
-            data: cancelledData,
+            data: currentQuarter.cancelledData,
             borderColor: "rgb(239, 68, 68)",
-            backgroundColor: "rgba(239, 68, 68, 0.2)",
+            backgroundColor:
+              lineChartType === "bar"
+                ? "rgba(239, 140, 140, 0.8)"
+                : "rgba(239, 68, 68, 0.2)",
             borderWidth: 3,
             tension: 0.4,
-            fill: true,
+            fill: lineChartType !== "bar",
             pointBackgroundColor: "rgb(239, 68, 68)",
             pointBorderColor: "#fff",
             pointBorderWidth: 2,
             pointRadius: 5,
             pointHoverRadius: 8,
+            borderRadius: lineChartType === "bar" ? 4 : 0,
           },
         ],
       };
@@ -1223,7 +1325,7 @@ const Home = () => {
           },
           title: {
             display: true,
-            text: "Monthly Flight Performance",
+            text: `Flight Performance - ${selectedQuarter.toUpperCase()} ${new Date().getFullYear()}`,
             font: {
               size: 16,
               weight: "bold",
@@ -1238,6 +1340,11 @@ const Home = () => {
             cornerRadius: 8,
             mode: "index",
             intersect: false,
+            callbacks: {
+              label: function (context) {
+                return `${context.dataset.label}: ${context.parsed.y}%`;
+              },
+            },
           },
         },
         scales: {
@@ -1266,7 +1373,7 @@ const Home = () => {
           x: {
             title: {
               display: true,
-              text: "Months",
+              text: `Months (${selectedQuarter.toUpperCase()})`,
               font: {
                 size: 12,
                 weight: "bold",
@@ -1283,38 +1390,15 @@ const Home = () => {
             },
           },
         },
-        animation: {
-          duration: 2000,
-          easing: "easeOutQuart",
+        interaction: {
+          mode: "nearest",
+          axis: "x",
+          intersect: false,
         },
-        ...(lineChartType === "bar" && {
-          animation: {
-            duration: 1800,
-            easing: "easeOutBack",
-          },
-          scales: {
-            y: {
-              beginAtZero: true,
-              max: 100,
-              ticks: {
-                callback: (v) => `${v}%`,
-                stepSize: 20,
-              },
-            },
-            x: {
-              grid: {
-                display: false,
-              },
-            },
-          },
-        }),
-        ...(lineChartType === "line" && {
-          animation: {
-            duration: 2000,
-            easing: "easeOutElastic",
-            tension: 0.4,
-          },
-        }),
+        animation: {
+          duration: lineChartType === "bar" ? 1200 : 1500,
+          easing: lineChartType === "bar" ? "easeOutBack" : "easeOutElastic",
+        },
       };
 
       performanceChartRef.current = new Chart(ctx, {
@@ -1331,7 +1415,26 @@ const Home = () => {
     } catch (error) {
       console.error("Error creating performance chart:", error);
     }
-  }, [lineChartType]);
+  }, [lineChartType, selectedQuarter]);
+
+  // Add this to your JSX where you want the quarter dropdown
+  const QuarterSelector = () => (
+    <div className="flex items-center gap-3">
+      <label className="text-sm font-medium text-slate-700">
+        Select Quarter:
+      </label>
+      <select
+        value={selectedQuarter}
+        onChange={(e) => setSelectedQuarter(e.target.value)}
+        className="border border-slate-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 bg-white"
+      >
+        <option value="q1">Q1 (Jan - Mar)</option>
+        <option value="q2">Q2 (Apr - Jun)</option>
+        <option value="q3">Q3 (Jul - Sep)</option>
+        <option value="q4">Q4 (Oct - Dec)</option>
+      </select>
+    </div>
+  );
 
   const toggleChartType = useCallback((type) => {
     setCurrentChartType(type);
@@ -1598,6 +1701,132 @@ const Home = () => {
     createPerformanceChart();
   }, [lineChartType, createPerformanceChart]);
 
+  
+
+const handleExportData = () => {
+  // Create worksheet data
+  const worksheetData = [
+    // Header row with empty cells for styling
+    ['Flight Schedule Report', '', '', '', '', '', '', '', '', ''],
+    [`Generated on: ${new Date().toLocaleDateString()}`, '', '', '', '', '', '', '', '', ''],
+    ['Bird Group Pvt Ltd', '', '', '', '', '', '', '', '', ''],
+    [], // Empty row for spacing
+    ['Flight No.', 'Airline', 'Route', 'Date', 'Time', 'Status', 'Arrival Status', 'Remarks', 'Signature', 'Media Files']
+  ];
+
+  // Add flight data
+  filteredFlights.forEach(flight => {
+    worksheetData.push([
+      flight.flightNo,
+      flight.airline,
+      flight.route,
+      flight.date,
+      flight.time,
+      flight.status,
+      flight.arrival,
+      flight.remarks !== '-' ? flight.remarks : '',
+      flight.signature !== '-' ? flight.signature : '',
+      flight.mediaFiles?.length > 0 ? `${flight.mediaFiles.length} file(s)` : 'None'
+    ]);
+  });
+
+  // Add summary section
+  worksheetData.push([]); // Empty row
+  worksheetData.push(['SUMMARY STATISTICS', '', '', '', '', '', '', '', '', '']);
+  worksheetData.push(['Total Flights', filteredFlights.length, '', '', '', '', '', '', '', '']);
+  worksheetData.push(['Scheduled Flights', filteredFlights.filter(f => f.status === 'Scheduled').length, '', '', '', '', '', '', '', '']);
+  worksheetData.push(['Canceled Flights', filteredFlights.filter(f => f.status === 'Canceled').length, '', '', '', '', '', '', '', '']);
+  worksheetData.push(['On Time Arrivals', filteredFlights.filter(f => f.arrival === 'On Time').length, '', '', '', '', '', '', '', '']);
+  worksheetData.push(['Delayed Arrivals', filteredFlights.filter(f => f.arrival === 'Delayed').length, '', '', '', '', '', '', '', '']);
+  worksheetData.push(['Arrived Flights', filteredFlights.filter(f => f.arrival === 'Arrived').length, '', '', '', '', '', '', '', '']);
+
+  // Create workbook and worksheet
+  const wb = utils.book_new();
+  const ws = utils.aoa_to_sheet(worksheetData);
+
+  // Define styles
+  const styles = {
+    // Main title style
+    A1: {
+      fill: { fgColor: { rgb: "0EA5E9" } }, // Sky blue background
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 16 },
+      alignment: { horizontal: "center" }
+    },
+    // Generation date
+    A2: {
+      fill: { fgColor: { rgb: "F0F9FF" } }, // Light blue background
+      font: { bold: true, color: { rgb: "0C4A6E" }, sz: 12 },
+      alignment: { horizontal: "center" }
+    },
+    // Company name
+    A3: {
+      fill: { fgColor: { rgb: "E0F2FE" } }, // Very light blue background
+      font: { bold: true, color: { rgb: "0369A1" }, sz: 14 },
+      alignment: { horizontal: "center" }
+    },
+    // Column headers (row 5)
+    A5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    B5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    C5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    D5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    E5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    F5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    G5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    H5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    I5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    J5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
+    // Summary header
+    A7: { 
+      fill: { fgColor: { rgb: "F59E0B" } }, 
+      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 14 },
+      alignment: { horizontal: "center" }
+    },
+    // Summary items
+    A8: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    A9: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    A10: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    A11: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    A12: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    A13: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } }
+  };
+
+  // Apply styles by setting cell properties
+  Object.keys(styles).forEach(cell => {
+    if (!ws[cell]) ws[cell] = {};
+    ws[cell].s = styles[cell];
+  });
+
+  // Merge cells for title rows
+  if (!ws['!merges']) ws['!merges'] = [];
+  ws['!merges'].push(
+    { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }, // Merge title row
+    { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } }, // Merge date row
+    { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } }  // Merge company row
+  );
+
+  // Set column widths for better readability
+  ws['!cols'] = [
+    { wch: 12 }, // Flight No.
+    { wch: 15 }, // Airline
+    { wch: 12 }, // Route
+    { wch: 12 }, // Date
+    { wch: 8 },  // Time
+    { wch: 12 }, // Status
+    { wch: 15 }, // Arrival Status
+    { wch: 20 }, // Remarks
+    { wch: 15 }, // Signature
+    { wch: 12 }  // Media Files
+  ];
+
+  // Add worksheet to workbook
+  utils.book_append_sheet(wb, ws, 'Flight Schedule');
+
+  // Write and download the file
+  writeFile(wb, `flight-schedule-${new Date().toISOString().split('T')[0]}.xlsx`);
+  
+  alert('Colorful Excel file downloaded successfully!');
+};
+
   const createParticles = useCallback(() => {
     const container = particlesContainerRef.current;
     if (!container) return;
@@ -1625,25 +1854,38 @@ const Home = () => {
   }, []);
 
   const applyFilters = useCallback(() => {
-    const searchTerm = (document.getElementById("searchInput")?.value || "").toLowerCase();
+    const searchTerm = (
+      document.getElementById("searchInput")?.value || ""
+    ).toLowerCase();
     const routeFilter = document.getElementById("routeFilter")?.value || "";
-    const aircraftFilter = document.getElementById("aircraftFilter")?.value || "";
+    const aircraftFilter =
+      document.getElementById("aircraftFilter")?.value || "";
     const statusFilter = document.getElementById("statusFilter")?.value || "";
 
     const filtered = flightData.filter((flight) => {
-      const matchesSearch = !searchTerm ||
+      const matchesSearch =
+        !searchTerm ||
         flight.flightNo.toLowerCase().includes(searchTerm) ||
         flight.route.toLowerCase().includes(searchTerm) ||
         flight.aircraft.toLowerCase().includes(searchTerm);
 
       const matchesRoute = !routeFilter || flight.route === routeFilter;
-      const matchesAircraft = !aircraftFilter || flight.aircraft === aircraftFilter;
+      const matchesAircraft =
+        !aircraftFilter || flight.aircraft === aircraftFilter;
       const matchesStatus = !statusFilter || flight.status === statusFilter;
-      
-      const matchesDateRange = !dateRange.start || !dateRange.end || 
+
+      const matchesDateRange =
+        !dateRange.start ||
+        !dateRange.end ||
         (flight.date >= dateRange.start && flight.date <= dateRange.end);
 
-      return matchesSearch && matchesRoute && matchesAircraft && matchesStatus && matchesDateRange;
+      return (
+        matchesSearch &&
+        matchesRoute &&
+        matchesAircraft &&
+        matchesStatus &&
+        matchesDateRange
+      );
     });
 
     setFilteredData(filtered);
@@ -2087,213 +2329,231 @@ const Home = () => {
         )}
       </nav>
 
-     <main className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
-  <div className="max-w-7xl mx-auto">
-    <div className="flex flex-col lg:flex-row gap-6">
-      {/* Calendar Sidebar - Desktop */}
-      <div className={`hidden lg:block transition-all duration-300 ${sidebarOpen ? 'w-64 flex-shrink-0' : 'w-0 overflow-hidden'}`}>
-        <CalendarSidebar
-          isOpen={true}
-          onClose={() => setSidebarOpen(false)}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          applyFilters={applyFilters}
-        />
-      </div>
-
-      {/* Mobile Calendar Sidebar */}
-      <div className="lg:hidden">
-        <CalendarSidebar
-          isOpen={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          dateRange={dateRange}
-          setDateRange={setDateRange}
-          applyFilters={applyFilters}
-        />
-      </div>
-
-      {/* Main Content Area */}
-      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? 'lg:max-w-[calc(100%-16rem)]' : 'lg:max-w-full'}`}>
-        {/* Dashboard Overview */}
-        <section id="dashboard" className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              Dashboard Overview
-            </h2>
-            {/* Desktop Calendar Toggle */}
-            <button
-              className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/30 transition-all duration-200"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
+      <main className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-6">
+            {/* Calendar Sidebar - Desktop */}
+            <div
+              className={`hidden lg:block transition-all duration-300 ${
+                sidebarOpen ? "w-64 flex-shrink-0" : "w-0 overflow-hidden"
+              }`}
             >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                />
-              </svg>
-              {sidebarOpen ? 'Hide Calendar' : 'Show Calendar'}
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              {
-                value: kpis.totalFlights,
-                label: "Total Flights",
-                icon: "✈️",
-                description: "Active flights in system",
-                color: "sky",
-                bgGradient: "from-sky-50 to-blue-50",
-                hoverGradient: "from-sky-100 to-blue-100",
-                progress: 75,
-              },
-              {
-                value: kpis.activePassengers,
-                label: "Active Passengers",
-                icon: "👥",
-                description: "Currently traveling",
-                color: "emerald",
-                bgGradient: "from-emerald-50 to-green-50",
-                hoverGradient: "from-emerald-100 to-green-100",
-                progress: 82,
-              },
-              {
-                value: `${kpis.fuelEfficiency}%`,
-                label: "Staff On Ground",
-                icon: "🧍",
-                description: "Staff Record",
-                color: "amber",
-                bgGradient: "from-amber-50 to-yellow-50",
-                hoverGradient: "from-amber-100 to-yellow-100",
-                progress: parseInt(kpis.fuelEfficiency),
-              },
-              {
-                value: `${kpis.onTimePerformance}%`,
-                label: "On-Time Performance",
-                icon: "⏱️",
-                description: "Schedule adherence",
-                color: "violet",
-                bgGradient: "from-violet-50 to-purple-50",
-                hoverGradient: "from-violet-100 to-purple-100",
-                progress: parseInt(kpis.onTimePerformance),
-              },
-            ].map((item, index) => (
-              <div
-                key={item.label}
-                className={`
+              <CalendarSidebar
+                isOpen={true}
+                onClose={() => setSidebarOpen(false)}
+                dateRange={dateRange}
+                setDateRange={setDateRange}
+                applyFilters={applyFilters}
+              />
+            </div>
+
+            {/* Mobile Calendar Sidebar */}
+            <div className="lg:hidden">
+              <CalendarSidebar
+                isOpen={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                dateRange={dateRange}
+                setDateRange={setDateRange}
+                applyFilters={applyFilters}
+              />
+            </div>
+
+            {/* Main Content Area */}
+            <div
+              className={`flex-1 transition-all duration-300 ${
+                sidebarOpen ? "lg:max-w-[calc(100%-16rem)]" : "lg:max-w-full"
+              }`}
+            >
+              {/* Dashboard Overview */}
+              <section id="dashboard" className="mb-8">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                    Dashboard Overview
+                  </h2>
+                  {/* Desktop Calendar Toggle */}
+                  <button
+                    className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/30 transition-all duration-200"
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                  >
+                    <svg
+                      className="w-4 h-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                    {sidebarOpen ? "Hide Calendar" : "Show Calendar"}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+                  {[
+                    {
+                      value: kpis.totalFlights,
+                      label: "Total Flights",
+                      icon: "✈️",
+                      description: "Active flights in system",
+                      color: "sky",
+                      bgGradient: "from-sky-50 to-blue-50",
+                      hoverGradient: "from-sky-100 to-blue-100",
+                      progress: 75,
+                    },
+                    {
+                      value: kpis.activePassengers,
+                      label: "Active Passengers",
+                      icon: "👥",
+                      description: "Currently traveling",
+                      color: "emerald",
+                      bgGradient: "from-emerald-50 to-green-50",
+                      hoverGradient: "from-emerald-100 to-green-100",
+                      progress: 82,
+                    },
+                    {
+                      value: `${kpis.fuelEfficiency}%`,
+                      label: "Staff On Ground",
+                      icon: "🧍",
+                      description: "Staff Record",
+                      color: "amber",
+                      bgGradient: "from-amber-50 to-yellow-50",
+                      hoverGradient: "from-amber-100 to-yellow-100",
+                      progress: parseInt(kpis.fuelEfficiency),
+                    },
+                    {
+                      value: `${kpis.onTimePerformance}%`,
+                      label: "On-Time Performance",
+                      icon: "⏱️",
+                      description: "Schedule adherence",
+                      color: "violet",
+                      bgGradient: "from-violet-50 to-purple-50",
+                      hoverGradient: "from-violet-100 to-purple-100",
+                      progress: parseInt(kpis.onTimePerformance),
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={item.label}
+                      className={`
                   relative bg-gradient-to-br ${item.bgGradient} border border-${item.color}-200
                   rounded-2xl p-6 shadow-lg hover:shadow-2xl 
                   transform transition-all duration-500 group 
                   overflow-hidden cursor-pointer
                   hover:${item.hoverGradient}
                 `}
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                {/* Animated background pattern */}
-                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-                  <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full translate-y-8 -translate-x-8"></div>
-                </div>
+                      style={{ animationDelay: `${index * 150}ms` }}
+                    >
+                      {/* Animated background pattern */}
+                      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/20 rounded-full translate-y-8 -translate-x-8"></div>
+                      </div>
 
-                <div className="relative z-10">
-                  {/* Header with icon and indicator */}
-                  <div className="flex items-center justify-between mb-4">
-                    <div
-                      className={`
+                      <div className="relative z-10">
+                        {/* Header with icon and indicator */}
+                        <div className="flex items-center justify-between mb-4">
+                          <div
+                            className={`
                         w-12 h-12 rounded-xl bg-white shadow-lg
                         flex items-center justify-center text-xl
                         transform group-hover:scale-110 group-hover:rotate-12
                         transition-all duration-500 border border-${item.color}-100
                       `}
-                    >
-                      <span className="icon-float">{item.icon}</span>
-                    </div>
-                    <div
-                      className={`
+                          >
+                            <span className="icon-float">{item.icon}</span>
+                          </div>
+                          <div
+                            className={`
                         w-2 h-2 rounded-full bg-${item.color}-400 
                         animate-pulse group-hover:animate-bounce
                       `}
-                    ></div>
-                  </div>
+                          ></div>
+                        </div>
 
-                  {/* Main content */}
-                  <div className="mb-2">
-                    <div
-                      className={`
+                        {/* Main content */}
+                        <div className="mb-2">
+                          <div
+                            className={`
                         text-2xl font-bold text-${item.color}-700 
                         transition-all duration-300
                       `}
+                          >
+                            {item.value}
+                          </div>
+                          <div className="text-lg font-semibold text-slate-700 mb-1">
+                            {item.label}
+                          </div>
+                          <div className="text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            {item.description}
+                          </div>
+                        </div>
+
+                        {/* Progress percentage */}
+                        <div className="text-xs text-slate-500 mt-1 text-right">
+                          {item.progress}%
+                        </div>
+                      </div>
+
+                      {/* Sparkle effect */}
+                      <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="sparkle text-lg">✨</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* Flight Operations */}
+              <section id="flights" className="mb-8">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                  <h2 className="text-2xl sm:text-3xl font-bold text-white">
+                    Flight Operations
+                  </h2>
+                  <div className="flex gap-3">
+                    <button
+                      className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                      onClick={exportToCSV}
                     >
-                      {item.value}
-                    </div>
-                    <div className="text-lg font-semibold text-slate-700 mb-1">
-                      {item.label}
-                    </div>
-                    <div className="text-xs text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      {item.description}
-                    </div>
-                  </div>
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                      Export <FaFileExcel />
+                    </button>
 
-                  {/* Progress percentage */}
-                  <div className="text-xs text-slate-500 mt-1 text-right">
-                    {item.progress}%
+                    {/* Mobile Calendar Toggle Button */}
+                    <button
+                      className="lg:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/30 transition-all duration-200 flex items-center gap-2"
+                      onClick={() => setSidebarOpen(!sidebarOpen)}
+                    >
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                      {sidebarOpen ? "Hide Calendar" : "Show Calendar"}
+                    </button>
                   </div>
                 </div>
-
-                {/* Sparkle effect */}
-                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="sparkle text-lg">✨</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Flight Operations */}
-        <section id="flights" className="mb-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-            <h2 className="text-2xl sm:text-3xl font-bold text-white">
-              Flight Operations
-            </h2>
-            <div className="flex gap-3">
-              <button
-                className="bg-gradient-to-r from-emerald-500 to-green-500 text-white px-4 sm:px-6 py-2 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105 flex items-center gap-2"
-                onClick={exportToCSV}
-              >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-                  />
-                </svg>
-                Export CSV
-              </button>
-
-              {/* Mobile Calendar Toggle Button */}
-              <button
-                className="lg:hidden bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-blue-500/30 transition-all duration-200 flex items-center gap-2"
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  />
-                </svg>
-                {sidebarOpen ? 'Hide Calendar' : 'Show Calendar'}
-              </button>
-            </div>
-          </div>
 
                 <div className="bg-white backdrop-blur-md border border-white/50 rounded-2xl p-4 shadow-lg mb-6">
                   <div className="flex flex-col lg:flex-row gap-3 items-start lg:items-center">
@@ -2371,10 +2631,10 @@ const Home = () => {
                             "Flight No.",
                             "Route",
                             "Aircraft",
+                            "Date",
                             "Arrival",
                             "Departure",
-                            "Scheduled",
-                            "Non-Scheduled",
+                            "Nature",
                             "Status",
                             "Actions",
                           ].map((header) => (
@@ -2391,7 +2651,7 @@ const Home = () => {
                         {filteredData.map((flight, index) => (
                           <tr
                             key={flight.flightNo}
-                            className="hover:bg-sky-500/100 transition-colors duration-200"
+                            className="hover:bg-sky-200/100 transition-colors duration-200"
                             style={{ animationDelay: `${index * 100}ms` }}
                           >
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-900">
@@ -2404,6 +2664,9 @@ const Home = () => {
                               {flight.aircraft}
                             </td>
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                              {flight.date}
+                            </td>
+                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
                               {flight.arrival}
                             </td>
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm text-slate-600">
@@ -2411,16 +2674,16 @@ const Home = () => {
                             </td>
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
                               <span
-                                className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${
+                                className={`inline-flex items-center justify-center w-8 h-8 rounded-full ${
                                   flight.scheduled
-                                    ? "bg-green-100 text-green-600"
-                                    : "bg-red-100 text-red-600"
+                                    ? "bg-green-100 text-green-700 text-bold text-md"
+                                    : "bg-red-100 text-red-700 text-bold text-md"
                                 }`}
                               >
-                                {flight.scheduled ? "✓" : "✗"}
+                                {flight.scheduled ? "S" : "NS"}
                               </span>
                             </td>
-                            <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
+                            {/* <td className="px-4 sm:px-6 py-4 whitespace-nowrap text-sm">
                               <span
                                 className={`inline-flex items-center justify-center w-6 h-6 rounded-full ${
                                   flight.nonScheduled
@@ -2430,7 +2693,7 @@ const Home = () => {
                               >
                                 {flight.nonScheduled ? "✓" : "✗"}
                               </span>
-                            </td>
+                            </td> */}
                             <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                               <span
                                 className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${
@@ -2600,7 +2863,7 @@ const Home = () => {
                         Flight Status Distribution
                       </h3>
                       <div className="flex gap-2 flex-wrap">
-                        {["pie", "bar", "doughnut"].map((type) => (
+                        {["bar", "pie", "doughnut"].map((type) => (
                           <button
                             key={type}
                             className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -2625,12 +2888,41 @@ const Home = () => {
                       <h3 className="text-lg font-semibold text-sky-600">
                         Flight Performance Trends
                       </h3>
-                      <button
-                        className="px-4 py-1 rounded-lg bg-sky-500 text-white text-sm font-medium shadow-sm shadow-sky-500/25 hover:shadow-sky-500/30 transition-all duration-200"
-                        onClick={toggleLineChart}
-                      >
-                        {lineChartType === "line" ? "Bar Chart" : "Line Chart"}
-                      </button>
+                      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                        {/* Quarter Selector */}
+                        <div className="flex items-center gap-3">
+                          <label className="text-sm font-medium text-slate-700">
+                            Quarter:
+                          </label>
+                          <select
+                            value={selectedQuarter}
+                            onChange={(e) => setSelectedQuarter(e.target.value)}
+                            className="border border-slate-300 rounded-lg px-3 py-1 text-sm focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all duration-200 bg-white"
+                          >
+                            <option value="q1">(Jan - Mar)</option>
+                            <option value="q2">(Apr - Jun)</option>
+                            <option value="q3">(Jul - Sep)</option>
+                            <option value="q4">(Oct - Dec)</option>
+                          </select>
+                        </div>
+
+                        {/* Chart Type Buttons */}
+                        <div className="flex gap-2 flex-wrap">
+                          {[ "bar","line"].map((type) => (
+                            <button
+                              key={type}
+                              className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
+                                lineChartType === type
+                                  ? "bg-sky-500 text-white shadow-sm shadow-sky-500/25"
+                                  : "bg-white text-slate-600 border border-slate-200 hover:border-sky-300"
+                              }`}
+                              onClick={() => setLineChartType(type)}
+                            >
+                              {type.charAt(0).toUpperCase() + type.slice(1)}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     <div className="h-72">
                       <canvas ref={performanceRef} />
@@ -3070,7 +3362,6 @@ const Home = () => {
         onClose={handleCloseConfirmation}
         onRaiseAnother={handleRaiseAnotherTicket}
       />
-      
 
       <style jsx>{`
         @keyframes float {
@@ -3118,7 +3409,8 @@ const Home = () => {
         <div className="container mx-auto px-6">
           <div className="text-center">
             <p className="text-gray-600 text-sm font-medium">
-              &copy; {new Date().getFullYear()} All rights reserved by Bird Group Pvt Ltd
+              &copy; {new Date().getFullYear()} All rights reserved by Bird
+              Group 
             </p>
           </div>
         </div>
