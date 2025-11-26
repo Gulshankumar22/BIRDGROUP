@@ -10,6 +10,9 @@ export default {
         'float': 'float 3s ease-in-out infinite',
         'fade-in-up': 'fadeInUp 0.5s ease-out',
         'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'pulse-glow': 'pulse-glow 4s ease-in-out infinite',
+        'pulse-glow-slow': 'pulse-glow-slow 8s ease-in-out infinite',
+        'rotate-gradient': 'rotate-gradient 15s linear infinite',
       },
       keyframes: {
         float: {
@@ -21,7 +24,19 @@ export default {
         fadeInUp: {
           'from': { opacity: '0', transform: 'translateY(30px)' },
           'to': { opacity: '1', transform: 'translateY(0)' },
-        }
+        },
+        'pulse-glow': {
+          '0%, 100%': { opacity: '0.5', transform: 'scale(1)' },
+          '50%': { opacity: '0.8', transform: 'scale(1.02)' },
+        },
+        'pulse-glow-slow': {
+          '0%, 100%': { opacity: '0.3', transform: 'scale(1)' },
+          '50%': { opacity: '0.6', transform: 'scale(1.01)' },
+        },
+        'rotate-gradient': {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',

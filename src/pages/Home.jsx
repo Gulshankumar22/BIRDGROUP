@@ -135,7 +135,7 @@ const FLIGHT_DATA = [
     scheduled: true,
     nonScheduled: false,
     status: "Active",
-  }
+  },
 ];
 
 const KPI_DATA = {
@@ -784,7 +784,7 @@ const CalendarSidebar = ({
               ? "bg-blue-100 text-blue-700"
               : isToday
               ? "bg-orange-100 text-orange-700 border border-orange-300"
-              : "text-gray-700 hover:bg-gray-100"
+              : "text-white hover:text-gray-700 hover:bg-gray-100"
           }
           ${(isStart || isEnd) && "ring-2 ring-white ring-opacity-50"}
         `}
@@ -807,75 +807,31 @@ const CalendarSidebar = ({
         />
       )}
 
-      {/* Sidebar */}
-      <div
-        className={`
-        fixed lg:sticky lg:top-20 h-[calc(100vh-5rem)] lg:h-auto w-80 bg-white/95 backdrop-blur-md rounded-xl
-        border-l border-gray-200/50 z-10 transform transition-transform duration-300
-        ${isOpen ? "translate-x-0" : "translate-x-full"}
-        lg:translate-x-0 lg:relative lg:w-64 lg:block
-      `}
-      >
-        <div className="p-4 h-full flex flex-col">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-800">Date Filter</h3>
-            <button
-              onClick={onClose}
-              className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
-            >
-              <svg
-                className="w-5 h-5 text-gray-500"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+      {/* Sidebar Container with Glowing Border */}
+      <div className="relative lg:sticky lg:top-20">
+        {/* Animated glowing border */}
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur-sm opacity-75 animate-pulse-glow"></div>
+        <div className="absolute -inset-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-lg blur-lg opacity-50 animate-pulse-glow-slow"></div>
 
-          {/* Selected Dates */}
-          <div className="bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl p-2 mb-6">
-            <div className="space-y-2">
-              <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  From
-                </label>
-                <div className="text-sm font-medium text-gray-800">
-                  {dateRange.start
-                    ? new Date(dateRange.start).toLocaleDateString()
-                    : "Select start date"}
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">
-                  To
-                </label>
-                <div className="text-sm font-medium text-gray-800">
-                  {dateRange.end
-                    ? new Date(dateRange.end).toLocaleDateString()
-                    : "Select end date"}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Calendar */}
-          <div className="flex-1">
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between mb-4">
+        {/* Sidebar */}
+        <div
+          className={`
+      relative bg-gray-900/90 backdrop-blur-lg
+      fixed lg:sticky lg:top-20 h-[calc(100vh-5rem)] lg:h-auto w-80 rounded-xl
+      border border-white/20 z-10 transform transition-transform duration-300 text-white
+      ${isOpen ? "translate-x-0" : "translate-x-full"}
+      lg:translate-x-0 lg:relative lg:w-64 lg:block
+    `}
+        >
+          <div className="p-4 h-full flex flex-col text-white">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
               <button
-                onClick={() => navigateMonth(-1)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                onClick={onClose}
+                className="lg:hidden w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-colors duration-200"
               >
                 <svg
-                  className="w-4 h-4 text-gray-600"
+                  className="w-5 h-5 text-white"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -884,73 +840,164 @@ const CalendarSidebar = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M15 19l-7-7 7-7"
+                    d="M6 18L18 6M6 6l12 12"
                   />
                 </svg>
               </button>
+            </div>
 
-              <h4 className="text-sm font-bold text-gray-800">
-                {currentMonth.toLocaleDateString("en-US", {
-                  month: "long",
-                  year: "numeric",
-                })}
-              </h4>
+            {/* Selected Dates */}
+            <div className="backdrop-blur-lg border border-white/30 rounded-xl p-2 mb-6">
+              <div className="space-y-2">
+                <div className="border-b border-white/30 pb-1">
+                  <label className="text-xs font-semibold text-white uppercase tracking-wide">
+                    From
+                  </label>
+                  <div className="text-sm font-medium text-white">
+                    {dateRange.start
+                      ? new Date(dateRange.start).toLocaleDateString()
+                      : "Select start date"}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-white uppercase tracking-wide">
+                    To
+                  </label>
+                  <div className="text-sm font-medium text-white">
+                    {dateRange.end
+                      ? new Date(dateRange.end).toLocaleDateString()
+                      : "Select end date"}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Calendar */}
+            <div className="flex-1 text-white">
+              {/* Month Navigation */}
+              <div className="flex items-center justify-between mb-4 text-white">
+                <button
+                  onClick={() => navigateMonth(-1)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-colors duration-200"
+                >
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                </button>
+
+                <h4 className="text-sm font-bold text-white">
+                  {currentMonth.toLocaleDateString("en-US", {
+                    month: "long",
+                    year: "numeric",
+                  })}
+                </h4>
+
+                <button
+                  onClick={() => navigateMonth(1)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/20 transition-colors duration-200"
+                >
+                  <svg
+                    className="w-4 h-4 text-white"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M9 5l7 7-7 7"
+                    />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Day Headers */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+                  <div
+                    key={day}
+                    className="text-xs font-semibold text-white text-center py-1"
+                  >
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="grid grid-cols-7 gap-1 text-white">{days}</div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="space-y-3 pt-6 border-t border-white/20">
+              <button
+                onClick={applyDateFilter}
+                disabled={!dateRange.start || !dateRange.end}
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+              >
+                Apply Filter
+              </button>
 
               <button
-                onClick={() => navigateMonth(1)}
-                className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors duration-200"
+                onClick={clearDates}
+                className="w-full border border-white/30 text-white py-3 rounded-xl font-semibold hover:bg-white/10 transition-all duration-200"
               >
-                <svg
-                  className="w-4 h-4 text-gray-600"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M9 5l7 7-7 7"
-                  />
-                </svg>
+                Clear Dates
               </button>
             </div>
-
-            {/* Day Headers */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-                <div
-                  key={day}
-                  className="text-xs font-semibold text-gray-500 text-center py-1"
-                >
-                  {day}
-                </div>
-              ))}
-            </div>
-
-            {/* Calendar Grid */}
-            <div className="grid grid-cols-7 gap-1">{days}</div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="space-y-3 pt-6 border-t border-gray-200">
-            <button
-              onClick={applyDateFilter}
-              disabled={!dateRange.start || !dateRange.end}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white py-3 rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
-            >
-              Apply Filter
-            </button>
-
-            <button
-              onClick={clearDates}
-              className="w-full border border-gray-300 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-50 transition-all duration-200"
-            >
-              Clear Dates
-            </button>
           </div>
         </div>
       </div>
+
+      {/* Add these styles to your global CSS */}
+      <style jsx>{`
+        @keyframes pulse-glow {
+          0%,
+          100% {
+            opacity: 0.5;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.02);
+          }
+        }
+        @keyframes pulse-glow-slow {
+          0%,
+          100% {
+            opacity: 0.3;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.6;
+            transform: scale(1.01);
+          }
+        }
+        @keyframes rotate-gradient {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        .animate-pulse-glow {
+          animation: pulse-glow 4s ease-in-out infinite;
+        }
+        .animate-pulse-glow-slow {
+          animation: pulse-glow-slow 8s ease-in-out infinite;
+        }
+      `}</style>
     </>
   );
 };
@@ -2338,7 +2385,7 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-800 via-slate-700 to-gray-900 ">
+    <div className="min-h-screen bg-gradient-to-r from-indigo-950 via-black to-indigo-950 ">
       <div
         ref={particlesContainerRef}
         className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
@@ -2374,48 +2421,151 @@ const Home = () => {
           <div className="hidden md:flex items-center gap-6">
             <a
               href="#dashboard"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>Dashboard</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  Dashboard
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  Dashboard
+                </div>
+              </div>
             </a>
+
             <a
               href="#flights"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>Flights</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  Flights
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  Flights
+                </div>
+              </div>
             </a>
+
             <a
               href="#MIS"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>MIS</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  MIS
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  MIS
+                </div>
+              </div>
             </a>
+
             <a
               href="#reports"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>Reports</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  Reports
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  Reports
+                </div>
+              </div>
             </a>
+
             <a
               href="#ticket-history"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>Ticket History</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  Ticket History
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  Ticket History
+                </div>
+              </div>
             </a>
+
             <a
               href="#gse"
-              className="flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium"
+              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
             >
-              <div className="w-2 h-2 bg-sky-500 rounded-full" />
-              <span>GSE</span>
+              <div className="relative w-6 h-6">
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
+                </div>
+              </div>
+              <div className="relative">
+                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
+                  GSE
+                </div>
+                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
+                  GSE
+                </div>
+              </div>
             </a>
           </div>
 
+          {/* Add these styles to your global CSS or Tailwind config */}
+          <style jsx>{`
+            .perspective-1000 {
+              perspective: 1000px;
+            }
+
+            .rotate-x-180 {
+              transform: rotateY(360deg);
+            }
+
+            .rotate-x-0 {
+              transform: rotateY(0deg);
+            }
+          `}</style>
           <div className="flex items-center gap-4">
             <button
               className="hidden md:inline-block bg-gradient-to-r from-gray-500 to-gray-900 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all duration-300 hover:scale-105"
