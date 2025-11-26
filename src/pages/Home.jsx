@@ -1007,6 +1007,7 @@ const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
+  
   const [filteredData, setFilteredData] = useState(FLIGHT_DATA);
   const [currentChartType, setCurrentChartType] = useState("bar");
   const [selectedQuarter, setSelectedQuarter] = useState("q1");
@@ -2390,14 +2391,15 @@ const Home = () => {
         ref={particlesContainerRef}
         className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
       />
-
-      <nav
-        id="navbar"
-        className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-slate-200/50 transition-all duration-300 px-4 sm:px-6 py-3"
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 flex items-center justify-center">
+ <nav
+      id="navbar"
+      className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-slate-200/50 transition-all duration-300 px-4 sm:px-6 py-3"
+    >
+      <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+        {/* Logo Section - Fixed Width */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          <div className="w-10 h-10 flex items-center justify-center">
+           <div className="w-10 h-10 flex items-center justify-center">
               <img
                 src="/logo.jpg"
                 alt="BirdGroup Logo"
@@ -2408,280 +2410,219 @@ const Home = () => {
                 }}
               />
             </div>
-            <h3 className="font-bold text-lg text-sky-900">
-              BIRD<span className="text-sky-600">GROUP</span>
-            </h3>
+          </div>
+          <h3 className="font-bold text-lg text-sky-900 whitespace-nowrap">
+            BIRD<span className="text-sky-600">GROUP</span>
+          </h3>
+          {userData?.airport && (
+            <div className="hidden lg:flex ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium whitespace-nowrap">
+              {userData.airport.city} - {userData.airport.code}
+            </div>
+          )}
+        </div>
+
+        {/* Navigation Links - Scrollable on smaller screens */}
+        <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-6 flex-1 justify-center overflow-x-auto scrollbar-hide px-4">
+          <a
+            href="#creation"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Creation
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#dashboard"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Advance
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#flights"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Scheduled
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#flights"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Non-Scheduled
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#MIS"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            MIS
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#reports"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Reports
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#ticket-history"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            Ticket History
+          </a>
+          <div className="h-5 w-px bg-slate-300"></div>
+          <a
+            href="#gse"
+            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
+          >
+            GSE
+          </a>
+        </div>
+
+        {/* User Section - Fixed Width */}
+        <div className="flex items-center gap-3 flex-shrink-0">
+          {isLoggedIn ? (
+            <div className="hidden md:flex items-center gap-3">
+              <div className="bg-white border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg font-medium text-sm whitespace-nowrap">
+                {userData?.user}
+              </div>
+              <button
+                className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-1.5 rounded-lg font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
+          ) : (
+            <button
+              className="hidden md:inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
+              onClick={handleLoginClick}
+            >
+              Login
+            </button>
+          )}
+
+          <button
+            className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors duration-200 flex-shrink-0"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d={
+                  mobileMenuOpen
+                    ? "M6 18L18 6M6 6l12 12"
+                    : "M4 6h16M4 12h16M4 18h16"
+                }
+              />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-lg">
+          <div className="px-4 py-3 space-y-2 max-h-[80vh] overflow-y-auto">
             {userData?.airport && (
-              <div className="ml-4 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              <div className="mb-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium text-center">
                 {userData.airport.city} - {userData.airport.code}
               </div>
             )}
-          </div>
-
-          <div className="hidden md:flex items-center gap-6">
+            <a
+              href="#creation"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+            >
+              Creation
+            </a>
             <a
               href="#dashboard"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  Dashboard
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  Dashboard
-                </div>
-              </div>
+              Advance
             </a>
-
             <a
               href="#flights"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  Flights
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  Flights
-                </div>
-              </div>
+              Scheduled
             </a>
-
+            <a
+              href="#flights"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+            >
+              Non-Scheduled
+            </a>
             <a
               href="#MIS"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  MIS
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  MIS
-                </div>
-              </div>
+              MIS
             </a>
-
             <a
               href="#reports"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  Reports
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  Reports
-                </div>
-              </div>
+              Reports
             </a>
-
             <a
               href="#ticket-history"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  Ticket History
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  Ticket History
-                </div>
-              </div>
+              Ticket History
             </a>
-
             <a
               href="#gse"
-              className="group flex items-center gap-2 text-slate-600 hover:text-sky-600 transition-all duration-500 font-medium perspective-1000"
+              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
             >
-              <div className="relative w-6 h-6">
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  <div className="w-2 h-2 bg-sky-500 rounded-full" />
-                </div>
-              </div>
-              <div className="relative">
-                <div className="transition-all duration-500 group-hover:rotate-y-180 group-hover:opacity-0">
-                  GSE
-                </div>
-                <div className="absolute inset-0 transition-all duration-500 opacity-0 rotate-y-180 group-hover:rotate-y-0 group-hover:opacity-100">
-                  GSE
-                </div>
-              </div>
+              GSE
             </a>
-          </div>
-
-          {/* Add these styles to your global CSS or Tailwind config */}
-          <style jsx>{`
-            .perspective-1000 {
-              perspective: 1000px;
-            }
-
-            .rotate-x-180 {
-              transform: rotateY(360deg);
-            }
-
-            .rotate-x-0 {
-              transform: rotateY(0deg);
-            }
-          `}</style>
-          <div className="flex items-center gap-4">
-            <button
-              className="hidden md:inline-block bg-gradient-to-r from-gray-500 to-gray-900 text-white px-6 py-2 rounded-xl font-bold shadow-lg shadow-gray-500/25 hover:shadow-xl hover:shadow-gray-500/30 transition-all duration-300 hover:scale-105"
-              onClick={openTicketModal}
-            >
-              🎫 RAISE IT TICKET
-            </button>
-
-            {isLoggedIn ? (
-              <div className="hidden md:flex items-center gap-3">
-                {/* User Badge */}
-                <div className="bg-white border border-emerald-200 text-emerald-700 px-3 py-1 rounded-lg font-medium text-sm">
+            
+            {isLoggedIn && (
+              <div className="pt-2 border-t border-slate-200">
+                <div className="mb-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-center">
                   {userData?.user}
                 </div>
-
-                {/* Logout Button */}
-                <button
-                  className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-1 rounded-lg font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
               </div>
+            )}
+            
+            {isLoggedIn ? (
+              <button
+                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white font-medium shadow-lg"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
             ) : (
               <button
-                className="hidden md:inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105"
+                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium shadow-lg"
                 onClick={handleLoginClick}
               >
                 Login
               </button>
             )}
-
-            <button
-              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors duration-200"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d={
-                    mobileMenuOpen
-                      ? "M6 18L18 6M6 6l12 12"
-                      : "M4 6h16M4 12h16M4 18h16"
-                  }
-                />
-              </svg>
-            </button>
           </div>
         </div>
+      )}
 
-        {mobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-lg">
-            <div className="px-4 py-3 space-y-3">
-              <a
-                href="#dashboard"
-                className="block py-2 px-4 rounded-lg bg-sky-50 text-sky-600 font-medium"
-              >
-                Dashboard
-              </a>
-              <a
-                href="#flights"
-                className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
-              >
-                Flights
-              </a>
-              <a
-                href="#reports"
-                className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
-              >
-                Reports
-              </a>
-              <a
-                href="#ticket-history"
-                className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
-              >
-                Ticket History
-              </a>
-              <a
-                href="#gse"
-                className="block py-2 px-4 rounded-lg hover:bg-slate-50 text-slate-600 font-medium"
-              >
-                GSE
-              </a>
-              <button
-                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-gray-500 to-gray-900 text-white font-bold shadow-lg shadow-gray-500/25"
-                onClick={openTicketModal}
-              >
-                🎫 RAISE IT TICKET
-              </button>
-              {isLoggedIn ? (
-                <button
-                  className="w-full py-2 px-4 rounded-lg bg-red-500 text-white font-medium"
-                  onClick={handleLogout}
-                >
-                  Logout
-                </button>
-              ) : (
-                <button
-                  className="w-full py-2 px-4 rounded-lg bg-sky-500 text-white font-medium"
-                  onClick={handleLoginClick}
-                >
-                  Login
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-      </nav>
-
+      <style jsx>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+      `}</style>
+    </nav>
       <main className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
