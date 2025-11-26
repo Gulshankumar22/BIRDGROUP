@@ -17,6 +17,7 @@ import {
   Image,
 } from "lucide-react";
 import { FaFileExcel } from "react-icons/fa";
+import * as XLSX from 'xlsx';
 
 const MISFlightSchedule = () => {
   const [filters, setFilters] = useState({
@@ -39,8 +40,7 @@ const MISFlightSchedule = () => {
     arrival: "Scheduled",
     description: "",
     personName: "",
-    actionType: "edit", // 'edit', 'cancel', 'add'
-    // Media upload fields
+    actionType: "edit",
     mediaFiles: [],
     mediaUrls: [],
     mediaDescriptions: [],
@@ -48,7 +48,7 @@ const MISFlightSchedule = () => {
 
   const [uploading, setUploading] = useState(false);
 
-  // Sample flight data - you can replace this with API data
+  // Sample flight data
   const [flightsData, setFlightsData] = useState([
     {
       id: 1,
@@ -122,6 +122,95 @@ const MISFlightSchedule = () => {
       remarks: "-",
       signature: "-",
       mediaFiles: [],
+    },
+    {
+      id: 6,
+      flightNo: "AI 202",
+      airline: "Air India",
+      route: "BOM–BLR-BOM",
+      date: "Nov 11, 2025",
+      time: "15:20",
+      status: "Scheduled",
+      arrival: "Delayed",
+      remarks: "Weather conditions",
+      signature: "Raj Sharma",
+      mediaFiles: [
+        {
+          id: 1,
+          name: "weather_update.jpg",
+          type: "image",
+          url: "#",
+          uploadedAt: "2025-11-11T14:30:00Z",
+        },
+      ],
+    },
+    {
+      id: 7,
+      flightNo: "6E 3456",
+      airline: "IndiGo",
+      route: "HYD–MAA-HYD",
+      date: "Nov 11, 2025",
+      time: "17:45",
+      status: "Scheduled",
+      arrival: "On Time",
+      remarks: "-",
+      signature: "-",
+      mediaFiles: [],
+    },
+    {
+      id: 8,
+      flightNo: "UK 901",
+      airline: "Vistara",
+      route: "DEL–MAA-DEL",
+      date: "Nov 11, 2025",
+      time: "19:30",
+      status: "Canceled",
+      arrival: "Canceled",
+      remarks: "Operational issues",
+      signature: "Priya Singh",
+      mediaFiles: [
+        {
+          id: 1,
+          name: "operations_memo.pdf",
+          type: "document",
+          url: "#",
+          uploadedAt: "2025-11-11T18:15:00Z",
+        },
+      ],
+    },
+    {
+      id: 9,
+      flightNo: "SG 678",
+      airline: "SpiceJet",
+      route: "BLR–CCU-BLR",
+      date: "Nov 11, 2025",
+      time: "21:00",
+      status: "Scheduled",
+      arrival: "Arrived",
+      remarks: "-",
+      signature: "-",
+      mediaFiles: [],
+    },
+    {
+      id: 10,
+      flightNo: "G8 456",
+      airline: "Go First",
+      route: "GOI–HYD-GOI",
+      date: "Nov 11, 2025",
+      time: "23:15",
+      status: "Scheduled",
+      arrival: "Delayed",
+      remarks: "Technical check",
+      signature: "Amit Kumar",
+      mediaFiles: [
+        {
+          id: 1,
+          name: "technical_checklist.pdf",
+          type: "document",
+          url: "#",
+          uploadedAt: "2025-11-11T22:45:00Z",
+        },
+      ],
     },
   ]);
 
@@ -215,7 +304,6 @@ const MISFlightSchedule = () => {
       description: flight.remarks !== "-" ? flight.remarks : "",
       personName: flight.signature !== "-" ? flight.signature : "",
       actionType: "cancel",
-      // Initialize media upload fields
       mediaFiles: [],
       mediaUrls: [],
       mediaDescriptions: [],
@@ -231,9 +319,7 @@ const MISFlightSchedule = () => {
     setUploading(true);
 
     try {
-      // Simulate file upload - replace with actual API call
       const uploadPromises = files.map(async (file) => {
-        // Simulate upload delay
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
         return {
@@ -242,14 +328,13 @@ const MISFlightSchedule = () => {
           name: file.name,
           type: file.type.startsWith("image/") ? "image" : "document",
           size: file.size,
-          url: URL.createObjectURL(file), // For preview
+          url: URL.createObjectURL(file),
           uploadedAt: new Date().toISOString(),
         };
       });
 
       const uploadedFiles = await Promise.all(uploadPromises);
 
-      // Update form state with new files
       setFlightForm((prev) => ({
         ...prev,
         mediaFiles: [...prev.mediaFiles, ...uploadedFiles],
@@ -260,7 +345,6 @@ const MISFlightSchedule = () => {
       alert("File upload failed. Please try again.");
     } finally {
       setUploading(false);
-      // Reset file input
       event.target.value = "";
     }
   };
@@ -275,7 +359,6 @@ const MISFlightSchedule = () => {
 
   const handleSaveFlightDetails = () => {
     if (flightForm.actionType === "add") {
-      // Add new flight
       const newFlight = {
         id: Math.max(...flightsData.map((f) => f.id)) + 1,
         flightNo: flightForm.flightNo,
@@ -293,7 +376,6 @@ const MISFlightSchedule = () => {
       setFlightsData((prev) => [...prev, newFlight]);
       alert("Flight added successfully!");
     } else if (selectedFlight) {
-      // Update existing flight
       const updatedFlights = flightsData.map((flight) => {
         if (flight.id === selectedFlight.id) {
           const updatedFlight = {
@@ -310,7 +392,6 @@ const MISFlightSchedule = () => {
             mediaFiles: flightForm.mediaFiles,
           };
 
-          // If action type is cancel, update status and arrival
           if (flightForm.actionType === "cancel") {
             updatedFlight.status = "Canceled";
             updatedFlight.arrival = "Canceled";
@@ -323,7 +404,6 @@ const MISFlightSchedule = () => {
 
       setFlightsData(updatedFlights);
 
-      // Show success message based on action type
       const actionMessage =
         flightForm.actionType === "cancel"
           ? "Flight cancelled successfully!"
@@ -351,52 +431,166 @@ const MISFlightSchedule = () => {
     });
   };
 
+  // Enhanced Excel Export with multiple sheets and colors
   const handleExportData = () => {
-    // Create CSV content
-    const headers = [
-      "Flight No.",
-      "Airline",
-      "Route",
-      "Date",
-      "Time",
-      "Status",
-      "Arrival",
-      "Remarks",
-      "Signature",
-    ];
-    const csvContent = [
-      headers.join(","),
-      ...filteredFlights.map((flight) =>
-        [
-          flight.flightNo,
-          flight.airline,
-          flight.route,
-          flight.date,
-          flight.time,
-          flight.status,
-          flight.arrival,
-          flight.remarks,
-          flight.signature,
-        ]
-          .map((field) => `"${field}"`)
-          .join(",")
-      ),
-    ].join("\n");
+    // Create workbook
+    const wb = XLSX.utils.book_new();
 
-    // Create and download file
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.setAttribute("hidden", "");
-    a.setAttribute("href", url);
-    a.setAttribute(
-      "download",
-      `flight-schedule-${new Date().toISOString().split("T")[0]}.csv`
-    );
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    // Define styles for different statuses
+    const styles = {
+      header: {
+        fill: { fgColor: { rgb: "4F81BD" } }, // Blue
+        font: { color: { rgb: "FFFFFF" }, bold: true },
+        alignment: { horizontal: "center", vertical: "center" },
+        border: {
+          top: { style: "thin", color: { rgb: "FFFFFF" } },
+          left: { style: "thin", color: { rgb: "FFFFFF" } },
+          bottom: { style: "thin", color: { rgb: "FFFFFF" } },
+          right: { style: "thin", color: { rgb: "FFFFFF" } }
+        }
+      },
+      arrived: {
+        fill: { fgColor: { rgb: "C6EFCE" } }, // Light Green
+        font: { color: { rgb: "006100" } }
+      },
+      delayed: {
+        fill: { fgColor: { rgb: "FFEB9C" } }, // Light Yellow
+        font: { color: { rgb: "9C6500" } }
+      },
+      canceled: {
+        fill: { fgColor: { rgb: "FFC7CE" } }, // Light Red
+        font: { color: { rgb: "9C0006" } }
+      },
+      onTime: {
+        fill: { fgColor: { rgb: "E2F0D9" } }, // Very Light Green
+        font: { color: { rgb: "385723" } }
+      },
+      scheduled: {
+        fill: { fgColor: { rgb: "DDEBF7" } }, // Light Blue
+        font: { color: { rgb: "2F5496" } }
+      }
+    };
+
+    // Helper function to create worksheet with styling
+    const createWorksheet = (data, sheetName, statusType) => {
+      if (data.length === 0) {
+        // Create empty sheet with message
+        const emptyData = [["No flights found in this category"]];
+        const ws = XLSX.utils.aoa_to_sheet(emptyData);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        return;
+      }
+
+      // Prepare data for Excel
+      const excelData = data.map(flight => [
+        flight.flightNo,
+        flight.airline,
+        flight.route,
+        flight.date,
+        flight.time,
+        flight.status,
+        flight.arrival,
+        flight.remarks,
+        flight.signature,
+        flight.mediaFiles?.length > 0 ? `${flight.mediaFiles.length} file(s)` : "No files"
+      ]);
+
+      // Add headers
+      const headers = [
+        "Flight No.",
+        "Airline",
+        "Route",
+        "Date",
+        "Time",
+        "Status",
+        "Arrival Status",
+        "Remarks",
+        "Signature",
+        "Media Files"
+      ];
+      excelData.unshift(headers);
+
+      // Create worksheet
+      const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+      // Apply styles
+      const range = XLSX.utils.decode_range(ws['!ref']);
+      
+      // Style header row
+      for (let C = range.s.c; C <= range.e.c; ++C) {
+        const headerCell = XLSX.utils.encode_cell({ r: range.s.r, c: C });
+        if (!ws[headerCell]) ws[headerCell] = {};
+        ws[headerCell].s = styles.header;
+      }
+
+      // Style data rows based on status
+      for (let R = range.s.r + 1; R <= range.e.r; ++R) {
+        const statusCell = XLSX.utils.encode_cell({ r: R, c: 6 }); // Column F (Arrival Status)
+        const statusValue = ws[statusCell]?.v;
+        
+        let rowStyle;
+        switch (statusValue) {
+          case 'Arrived':
+            rowStyle = styles.arrived;
+            break;
+          case 'Delayed':
+            rowStyle = styles.delayed;
+            break;
+          case 'Canceled':
+            rowStyle = styles.canceled;
+            break;
+          case 'On Time':
+            rowStyle = styles.onTime;
+            break;
+          case 'Scheduled':
+            rowStyle = styles.scheduled;
+            break;
+          default:
+            rowStyle = {};
+        }
+
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+          const cell = XLSX.utils.encode_cell({ r: R, c: C });
+          if (!ws[cell]) ws[cell] = {};
+          ws[cell].s = { ...rowStyle, alignment: { vertical: "center" } };
+        }
+      }
+
+      // Set column widths
+      ws['!cols'] = [
+        { wch: 12 }, // Flight No.
+        { wch: 15 }, // Airline
+        { wch: 20 }, // Route
+        { wch: 15 }, // Date
+        { wch: 10 }, // Time
+        { wch: 12 }, // Status
+        { wch: 15 }, // Arrival Status
+        { wch: 25 }, // Remarks
+        { wch: 15 }, // Signature
+        { wch: 15 }  // Media Files
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, sheetName);
+    };
+
+    // Categorize flights
+    const arrivedFlights = flightsData.filter(flight => flight.arrival === "Arrived");
+    const delayedFlights = flightsData.filter(flight => flight.arrival === "Delayed");
+    const canceledFlights = flightsData.filter(flight => flight.status === "Canceled" || flight.arrival === "Canceled");
+    const allFlights = flightsData;
+
+    // Create sheets for each category
+    createWorksheet(allFlights, "Proj_Skd", "all");
+    createWorksheet(arrivedFlights, "Reco_Skd", "arrived");
+    createWorksheet(delayedFlights, "Delayed", "delayed");
+    createWorksheet(canceledFlights, "Addl & XXLD Flt ", "canceled");
+  
+
+    // Generate Excel file
+    const fileName = `flight-schedule-${new Date().toISOString().split('T')[0]}.xlsx`;
+    XLSX.writeFile(wb, fileName);
+    
+    alert(`Excel file "${fileName}" downloaded successfully with multiple sheets!`);
   };
 
   const stations = [
@@ -562,7 +756,14 @@ const MISFlightSchedule = () => {
               className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105"
             >
               <Download className="h-4 w-4" />
-              Export <FaFileExcel />
+              BHS-MIS <FaFileExcel />
+            </button>
+             <button
+            
+              className="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-500 text-white px-6 py-3 rounded-xl font-semibold shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/30 transition-all duration-300 hover:scale-105"
+            >
+              <Download className="h-4 w-4" />
+              ADS-MIS <FaFileExcel />
             </button>
           </div>
         </div>
@@ -654,7 +855,7 @@ const MISFlightSchedule = () => {
               {filteredFlights.map((flight, index) => (
                 <tr
                   key={flight.id}
-                  className="hover:bg-sky-400/100 transition-colors duration-200"
+                  className="hover:bg-sky-200/100 transition-colors duration-200"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-sky-900">

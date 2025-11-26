@@ -10,7 +10,7 @@ import "chartjs-plugin-datalabels";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import MISFlightSchedule from "../pages/MISFlightSchedule";
-import { utils, writeFile } from 'xlsx';
+import { utils, writeFile } from "xlsx";
 import { FaFileExcel } from "react-icons/fa";
 
 // Fix for Leaflet default markers
@@ -81,6 +81,61 @@ const FLIGHT_DATA = [
     nonScheduled: false,
     status: "Active",
   },
+  {
+    flightNo: "AF606",
+    route: "HYD-MAA-HYD",
+    aircraft: "A320neo",
+    arrival: "09:15",
+    departure: "07:30",
+    date: "2025-11-20",
+    scheduled: true,
+    nonScheduled: false,
+    status: "Active",
+  },
+  {
+    flightNo: "AF707",
+    route: "DEL-CCU-DEL",
+    aircraft: "B787",
+    arrival: "13:45",
+    departure: "11:20",
+    date: "2025-11-21",
+    scheduled: false,
+    nonScheduled: true,
+    status: "Delayed",
+  },
+  {
+    flightNo: "AF808",
+    route: "BLR-GOI-BLR",
+    aircraft: "A319",
+    arrival: "17:20",
+    departure: "15:45",
+    date: "2025-11-22",
+    scheduled: true,
+    nonScheduled: false,
+    status: "Active",
+  },
+  {
+    flightNo: "AF909",
+    route: "BOM-HYD-BOM",
+    aircraft: "A321",
+    arrival: "21:30",
+    departure: "19:15",
+    date: "2025-11-23",
+    scheduled: false,
+    nonScheduled: true,
+    status: "Cancelled",
+  },
+  {
+    flightNo: "AF1010",
+    route: "DEL-MAA-DEL",
+    aircraft: "B737 MAX",
+    arrival: "23:55",
+    departure: "21:40",
+    date: "2025-11-24",
+    scheduled: true,
+    nonScheduled: false,
+    status: "Active",
+  }
 ];
 
 const KPI_DATA = {
@@ -496,16 +551,16 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                 <button
                   key={airport.id}
                   onClick={() => handleAirportSelect(airport)}
-                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-left ${
+                  className={`p-4 rounded-xl border-2 transition-all duration-200 text-left w-full min-h-[100px] flex items-center ${
                     selectedAirport?.id === airport.id
-                      ? "border-indigo-500 bg-indigo-50 scale-105"
-                      : "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-25"
+                      ? "border-indigo-500 bg-indigo-50 scale-105 shadow-lg"
+                      : "border-gray-200 bg-white hover:border-indigo-300 hover:bg-indigo-25 hover:shadow-md"
                   }`}
                 >
-                  <div className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-red-500 rounded-full flex items-center justify-center">
+                  <div className="flex items-center space-x-3 w-full">
+                    <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full flex items-center justify-center">
                       <svg
-                        className="w-5 h-5 text-white"
+                        className="w-6 h-6 text-white animate-bounce"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -514,16 +569,24 @@ const LoginModal = ({ isOpen, onClose, onLogin }) => {
                           strokeLinecap="round"
                           strokeLinejoin="round"
                           strokeWidth={2}
-                          d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
+                          d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                        />
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                         />
                       </svg>
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-gray-800">
+                    <div className="flex-grow min-w-0">
+                      <h4 className="font-semibold text-gray-800 truncate">
                         {airport.city}
                       </h4>
-                      <p className="text-sm text-gray-600">{airport.name}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-sm text-gray-600 truncate">
+                        {airport.name}
+                      </p>
+                      <p className="text-xs text-gray-500 mt-1">
                         Code: {airport.code}
                       </p>
                     </div>
@@ -1701,131 +1764,263 @@ const Home = () => {
     createPerformanceChart();
   }, [lineChartType, createPerformanceChart]);
 
-  
+  const handleExportData = () => {
+    // Create worksheet data
+    const worksheetData = [
+      // Header row with empty cells for styling
+      ["Flight Schedule Report", "", "", "", "", "", "", "", "", ""],
+      [
+        `Generated on: ${new Date().toLocaleDateString()}`,
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+        "",
+      ],
+      ["Bird Group Pvt Ltd", "", "", "", "", "", "", "", "", ""],
+      [], // Empty row for spacing
+      [
+        "Flight No.",
+        "Airline",
+        "Route",
+        "Date",
+        "Time",
+        "Status",
+        "Arrival Status",
+        "Remarks",
+        "Signature",
+        "Media Files",
+      ],
+    ];
 
-const handleExportData = () => {
-  // Create worksheet data
-  const worksheetData = [
-    // Header row with empty cells for styling
-    ['Flight Schedule Report', '', '', '', '', '', '', '', '', ''],
-    [`Generated on: ${new Date().toLocaleDateString()}`, '', '', '', '', '', '', '', '', ''],
-    ['Bird Group Pvt Ltd', '', '', '', '', '', '', '', '', ''],
-    [], // Empty row for spacing
-    ['Flight No.', 'Airline', 'Route', 'Date', 'Time', 'Status', 'Arrival Status', 'Remarks', 'Signature', 'Media Files']
-  ];
+    // Add flight data
+    filteredFlights.forEach((flight) => {
+      worksheetData.push([
+        flight.flightNo,
+        flight.airline,
+        flight.route,
+        flight.date,
+        flight.time,
+        flight.status,
+        flight.arrival,
+        flight.remarks !== "-" ? flight.remarks : "",
+        flight.signature !== "-" ? flight.signature : "",
+        flight.mediaFiles?.length > 0
+          ? `${flight.mediaFiles.length} file(s)`
+          : "None",
+      ]);
+    });
 
-  // Add flight data
-  filteredFlights.forEach(flight => {
+    // Add summary section
+    worksheetData.push([]); // Empty row
     worksheetData.push([
-      flight.flightNo,
-      flight.airline,
-      flight.route,
-      flight.date,
-      flight.time,
-      flight.status,
-      flight.arrival,
-      flight.remarks !== '-' ? flight.remarks : '',
-      flight.signature !== '-' ? flight.signature : '',
-      flight.mediaFiles?.length > 0 ? `${flight.mediaFiles.length} file(s)` : 'None'
+      "SUMMARY STATISTICS",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
     ]);
-  });
+    worksheetData.push([
+      "Total Flights",
+      filteredFlights.length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+    worksheetData.push([
+      "Scheduled Flights",
+      filteredFlights.filter((f) => f.status === "Scheduled").length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+    worksheetData.push([
+      "Canceled Flights",
+      filteredFlights.filter((f) => f.status === "Canceled").length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+    worksheetData.push([
+      "On Time Arrivals",
+      filteredFlights.filter((f) => f.arrival === "On Time").length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+    worksheetData.push([
+      "Delayed Arrivals",
+      filteredFlights.filter((f) => f.arrival === "Delayed").length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
+    worksheetData.push([
+      "Arrived Flights",
+      filteredFlights.filter((f) => f.arrival === "Arrived").length,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+    ]);
 
-  // Add summary section
-  worksheetData.push([]); // Empty row
-  worksheetData.push(['SUMMARY STATISTICS', '', '', '', '', '', '', '', '', '']);
-  worksheetData.push(['Total Flights', filteredFlights.length, '', '', '', '', '', '', '', '']);
-  worksheetData.push(['Scheduled Flights', filteredFlights.filter(f => f.status === 'Scheduled').length, '', '', '', '', '', '', '', '']);
-  worksheetData.push(['Canceled Flights', filteredFlights.filter(f => f.status === 'Canceled').length, '', '', '', '', '', '', '', '']);
-  worksheetData.push(['On Time Arrivals', filteredFlights.filter(f => f.arrival === 'On Time').length, '', '', '', '', '', '', '', '']);
-  worksheetData.push(['Delayed Arrivals', filteredFlights.filter(f => f.arrival === 'Delayed').length, '', '', '', '', '', '', '', '']);
-  worksheetData.push(['Arrived Flights', filteredFlights.filter(f => f.arrival === 'Arrived').length, '', '', '', '', '', '', '', '']);
+    // Create workbook and worksheet
+    const wb = utils.book_new();
+    const ws = utils.aoa_to_sheet(worksheetData);
 
-  // Create workbook and worksheet
-  const wb = utils.book_new();
-  const ws = utils.aoa_to_sheet(worksheetData);
+    // Define styles
+    const styles = {
+      // Main title style
+      A1: {
+        fill: { fgColor: { rgb: "0EA5E9" } }, // Sky blue background
+        font: { bold: true, color: { rgb: "FFFFFF" }, sz: 16 },
+        alignment: { horizontal: "center" },
+      },
+      // Generation date
+      A2: {
+        fill: { fgColor: { rgb: "F0F9FF" } }, // Light blue background
+        font: { bold: true, color: { rgb: "0C4A6E" }, sz: 12 },
+        alignment: { horizontal: "center" },
+      },
+      // Company name
+      A3: {
+        fill: { fgColor: { rgb: "E0F2FE" } }, // Very light blue background
+        font: { bold: true, color: { rgb: "0369A1" }, sz: 14 },
+        alignment: { horizontal: "center" },
+      },
+      // Column headers (row 5)
+      A5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      B5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      C5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      D5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      E5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      F5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      G5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      H5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      I5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      J5: {
+        fill: { fgColor: { rgb: "1E40AF" } },
+        font: { bold: true, color: { rgb: "FFFFFF" } },
+      },
+      // Summary header
+      A7: {
+        fill: { fgColor: { rgb: "F59E0B" } },
+        font: { bold: true, color: { rgb: "FFFFFF" }, sz: 14 },
+        alignment: { horizontal: "center" },
+      },
+      // Summary items
+      A8: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+      A9: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+      A10: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+      A11: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+      A12: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+      A13: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
+    };
 
-  // Define styles
-  const styles = {
-    // Main title style
-    A1: {
-      fill: { fgColor: { rgb: "0EA5E9" } }, // Sky blue background
-      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 16 },
-      alignment: { horizontal: "center" }
-    },
-    // Generation date
-    A2: {
-      fill: { fgColor: { rgb: "F0F9FF" } }, // Light blue background
-      font: { bold: true, color: { rgb: "0C4A6E" }, sz: 12 },
-      alignment: { horizontal: "center" }
-    },
-    // Company name
-    A3: {
-      fill: { fgColor: { rgb: "E0F2FE" } }, // Very light blue background
-      font: { bold: true, color: { rgb: "0369A1" }, sz: 14 },
-      alignment: { horizontal: "center" }
-    },
-    // Column headers (row 5)
-    A5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    B5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    C5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    D5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    E5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    F5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    G5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    H5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    I5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    J5: { fill: { fgColor: { rgb: "1E40AF" } }, font: { bold: true, color: { rgb: "FFFFFF" } } },
-    // Summary header
-    A7: { 
-      fill: { fgColor: { rgb: "F59E0B" } }, 
-      font: { bold: true, color: { rgb: "FFFFFF" }, sz: 14 },
-      alignment: { horizontal: "center" }
-    },
-    // Summary items
-    A8: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
-    A9: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
-    A10: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
-    A11: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
-    A12: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } },
-    A13: { fill: { fgColor: { rgb: "FEF3C7" } }, font: { bold: true } }
+    // Apply styles by setting cell properties
+    Object.keys(styles).forEach((cell) => {
+      if (!ws[cell]) ws[cell] = {};
+      ws[cell].s = styles[cell];
+    });
+
+    // Merge cells for title rows
+    if (!ws["!merges"]) ws["!merges"] = [];
+    ws["!merges"].push(
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }, // Merge title row
+      { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } }, // Merge date row
+      { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } } // Merge company row
+    );
+
+    // Set column widths for better readability
+    ws["!cols"] = [
+      { wch: 12 }, // Flight No.
+      { wch: 15 }, // Airline
+      { wch: 12 }, // Route
+      { wch: 12 }, // Date
+      { wch: 8 }, // Time
+      { wch: 12 }, // Status
+      { wch: 15 }, // Arrival Status
+      { wch: 20 }, // Remarks
+      { wch: 15 }, // Signature
+      { wch: 12 }, // Media Files
+    ];
+
+    // Add worksheet to workbook
+    utils.book_append_sheet(wb, ws, "Flight Schedule");
+
+    // Write and download the file
+    writeFile(
+      wb,
+      `flight-schedule-${new Date().toISOString().split("T")[0]}.xlsx`
+    );
+
+    alert("Colorful Excel file downloaded successfully!");
   };
-
-  // Apply styles by setting cell properties
-  Object.keys(styles).forEach(cell => {
-    if (!ws[cell]) ws[cell] = {};
-    ws[cell].s = styles[cell];
-  });
-
-  // Merge cells for title rows
-  if (!ws['!merges']) ws['!merges'] = [];
-  ws['!merges'].push(
-    { s: { r: 0, c: 0 }, e: { r: 0, c: 9 } }, // Merge title row
-    { s: { r: 1, c: 0 }, e: { r: 1, c: 9 } }, // Merge date row
-    { s: { r: 2, c: 0 }, e: { r: 2, c: 9 } }  // Merge company row
-  );
-
-  // Set column widths for better readability
-  ws['!cols'] = [
-    { wch: 12 }, // Flight No.
-    { wch: 15 }, // Airline
-    { wch: 12 }, // Route
-    { wch: 12 }, // Date
-    { wch: 8 },  // Time
-    { wch: 12 }, // Status
-    { wch: 15 }, // Arrival Status
-    { wch: 20 }, // Remarks
-    { wch: 15 }, // Signature
-    { wch: 12 }  // Media Files
-  ];
-
-  // Add worksheet to workbook
-  utils.book_append_sheet(wb, ws, 'Flight Schedule');
-
-  // Write and download the file
-  writeFile(wb, `flight-schedule-${new Date().toISOString().split('T')[0]}.xlsx`);
-  
-  alert('Colorful Excel file downloaded successfully!');
-};
 
   const createParticles = useCallback(() => {
     const container = particlesContainerRef.current;
@@ -2230,12 +2425,20 @@ const handleExportData = () => {
             </button>
 
             {isLoggedIn ? (
-              <button
-                className="hidden md:inline-block bg-gradient-to-r from-red-500 to-pink-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105"
-                onClick={handleLogout}
-              >
-                Logout ({userData?.user})
-              </button>
+              <div className="hidden md:flex items-center gap-3">
+                {/* User Badge */}
+                <div className="bg-white border border-emerald-200 text-emerald-700 px-3 py-1 rounded-lg font-medium text-sm">
+                  {userData?.user}
+                </div>
+
+                {/* Logout Button */}
+                <button
+                  className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-1 rounded-lg font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              </div>
             ) : (
               <button
                 className="hidden md:inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105"
@@ -2314,7 +2517,7 @@ const handleExportData = () => {
                   className="w-full py-2 px-4 rounded-lg bg-red-500 text-white font-medium"
                   onClick={handleLogout}
                 >
-                  Logout ({userData?.user})
+                  Logout
                 </button>
               ) : (
                 <button
@@ -2908,7 +3111,7 @@ const handleExportData = () => {
 
                         {/* Chart Type Buttons */}
                         <div className="flex gap-2 flex-wrap">
-                          {[ "bar","line"].map((type) => (
+                          {["bar", "line"].map((type) => (
                             <button
                               key={type}
                               className={`px-3 py-1 rounded-lg text-sm font-medium transition-all duration-200 ${
@@ -3410,7 +3613,7 @@ const handleExportData = () => {
           <div className="text-center">
             <p className="text-gray-600 text-sm font-medium">
               &copy; {new Date().getFullYear()} All rights reserved by Bird
-              Group 
+              Group
             </p>
           </div>
         </div>
