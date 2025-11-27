@@ -948,6 +948,8 @@ const CalendarSidebar = ({
                 Apply Filter
               </button>
 
+              
+
               <button
                 onClick={clearDates}
                 className="w-full border border-white/30 text-white py-3 rounded-xl font-semibold hover:bg-white/10 transition-all duration-200"
@@ -2398,9 +2400,9 @@ const Home = () => {
       <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
         {/* Logo Section - Fixed Width */}
         <div className="flex items-center gap-3 flex-shrink-0">
-          <div className="w-10 h-10 flex items-center justify-center">
+          
            <div className="w-10 h-10 flex items-center justify-center">
-              <img
+              <img 
                 src="/logo.jpg"
                 alt="BirdGroup Logo"
                 className="w-12 h-12 object-contain"
@@ -2410,7 +2412,7 @@ const Home = () => {
                 }}
               />
             </div>
-          </div>
+          
           <h3 className="font-bold text-lg text-sky-900 whitespace-nowrap">
             BIRD<span className="text-sky-600">GROUP</span>
           </h3>
