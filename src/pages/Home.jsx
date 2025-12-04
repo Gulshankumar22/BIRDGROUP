@@ -12,6 +12,8 @@ import "leaflet/dist/leaflet.css";
 import MISFlightSchedule from "../pages/MISFlightSchedule";
 import { utils, writeFile } from "xlsx";
 import { FaFileExcel } from "react-icons/fa";
+import AirportLogin from "../components/login/AirportLogin.jsx";
+// import AirportLogin from "./components/login/AirportLogin.jsx";
 
 // Fix for Leaflet default markers
 delete L.Icon.Default.prototype._getIconUrl;
@@ -948,8 +950,6 @@ const CalendarSidebar = ({
                 Apply Filter
               </button>
 
-              
-
               <button
                 onClick={clearDates}
                 className="w-full border border-white/30 text-white py-3 rounded-xl font-semibold hover:bg-white/10 transition-all duration-200"
@@ -1009,7 +1009,7 @@ const Home = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  
+
   const [filteredData, setFilteredData] = useState(FLIGHT_DATA);
   const [currentChartType, setCurrentChartType] = useState("bar");
   const [selectedQuarter, setSelectedQuarter] = useState("q1");
@@ -2393,16 +2393,15 @@ const Home = () => {
         ref={particlesContainerRef}
         className="fixed inset-0 -z-10 pointer-events-none overflow-hidden"
       />
- <nav
-      id="navbar"
-      className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-slate-200/50 transition-all duration-300 px-4 sm:px-6 py-3"
-    >
-      <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
-        {/* Logo Section - Fixed Width */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          
-           <div className="w-10 h-10 flex items-center justify-center">
-              <img 
+      <nav
+        id="navbar"
+        className="fixed top-0 left-0 right-0 z-50 bg-white backdrop-blur-md border-b border-slate-200/50 transition-all duration-300 px-4 sm:px-6 py-3"
+      >
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
+          {/* Logo Section - Fixed Width */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            <div className="w-10 h-10 flex items-center justify-center">
+              <img
                 src="/logo.jpg"
                 alt="BirdGroup Logo"
                 className="w-12 h-12 object-contain"
@@ -2412,219 +2411,219 @@ const Home = () => {
                 }}
               />
             </div>
-          
-          <h3 className="font-bold text-lg text-sky-900 whitespace-nowrap">
-            BIRD<span className="text-sky-600">GROUP</span>
-          </h3>
-          {userData?.airport && (
-            <div className="hidden lg:flex ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium whitespace-nowrap">
-              {userData.airport.city} - {userData.airport.code}
-            </div>
-          )}
-        </div>
 
-        {/* Navigation Links - Scrollable on smaller screens */}
-        <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-6 flex-1 justify-center overflow-x-auto scrollbar-hide px-4">
-          <a
-            href="#creation"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Creation
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#dashboard"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Advance
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#flights"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Scheduled
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#flights"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Non-Scheduled
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#MIS"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            MIS
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#reports"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Reports
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#ticket-history"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            Ticket History
-          </a>
-          <div className="h-5 w-px bg-slate-300"></div>
-          <a
-            href="#gse"
-            className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
-          >
-            GSE
-          </a>
-        </div>
-
-        {/* User Section - Fixed Width */}
-        <div className="flex items-center gap-3 flex-shrink-0">
-          {isLoggedIn ? (
-            <div className="hidden md:flex items-center gap-3">
-              <div className="bg-white border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg font-medium text-sm whitespace-nowrap">
-                {userData?.user}
-              </div>
-              <button
-                className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-1.5 rounded-lg font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <button
-              className="hidden md:inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
-              onClick={handleLoginClick}
-            >
-              Login
-            </button>
-          )}
-
-          <button
-            className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors duration-200 flex-shrink-0"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d={
-                  mobileMenuOpen
-                    ? "M6 18L18 6M6 6l12 12"
-                    : "M4 6h16M4 12h16M4 18h16"
-                }
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-lg">
-          <div className="px-4 py-3 space-y-2 max-h-[80vh] overflow-y-auto">
+            <h3 className="font-bold text-lg text-sky-900 whitespace-nowrap">
+              BIRD<span className="text-sky-600">GROUP</span>
+            </h3>
             {userData?.airport && (
-              <div className="mb-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium text-center">
+              <div className="hidden lg:flex ml-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium whitespace-nowrap">
                 {userData.airport.city} - {userData.airport.code}
               </div>
             )}
+          </div>
+
+          {/* Navigation Links - Scrollable on smaller screens */}
+          <div className="hidden md:flex items-center gap-3 lg:gap-4 xl:gap-6 flex-1 justify-center overflow-x-auto scrollbar-hide px-4">
             <a
               href="#creation"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Creation
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#dashboard"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Advance
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#flights"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Scheduled
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#flights"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Non-Scheduled
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#MIS"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               MIS
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#reports"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Reports
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#ticket-history"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               Ticket History
             </a>
+            <div className="h-5 w-px bg-slate-300"></div>
             <a
               href="#gse"
-              className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              className="text-slate-600 hover:text-sky-600 transition-colors duration-200 font-medium text-sm whitespace-nowrap flex-shrink-0 px-2 py-1"
             >
               GSE
             </a>
-            
-            {isLoggedIn && (
-              <div className="pt-2 border-t border-slate-200">
-                <div className="mb-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-center">
+          </div>
+
+          {/* User Section - Fixed Width */}
+          <div className="flex items-center gap-3 flex-shrink-0">
+            {isLoggedIn ? (
+              <div className="hidden md:flex items-center gap-3">
+                <div className="bg-white border border-emerald-200 text-emerald-700 px-3 py-1.5 rounded-lg font-medium text-sm whitespace-nowrap">
                   {userData?.user}
                 </div>
+                <button
+                  className="bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-1.5 rounded-lg font-semibold text-sm shadow-lg shadow-red-500/25 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
               </div>
-            )}
-            
-            {isLoggedIn ? (
-              <button
-                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white font-medium shadow-lg"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
             ) : (
               <button
-                className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium shadow-lg"
+                className="hidden md:inline-block bg-gradient-to-r from-sky-500 to-blue-600 text-white px-6 py-2 rounded-xl font-semibold shadow-lg shadow-sky-500/25 hover:shadow-xl hover:shadow-sky-500/30 transition-all duration-300 hover:scale-105 whitespace-nowrap"
                 onClick={handleLoginClick}
               >
                 Login
               </button>
             )}
+
+            <button
+              className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg bg-sky-50 text-sky-600 hover:bg-sky-100 transition-colors duration-200 flex-shrink-0"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d={
+                    mobileMenuOpen
+                      ? "M6 18L18 6M6 6l12 12"
+                      : "M4 6h16M4 12h16M4 18h16"
+                  }
+                />
+              </svg>
+            </button>
           </div>
         </div>
-      )}
 
-      <style jsx>{`
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-    </nav>
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-b border-slate-200/50 shadow-lg">
+            <div className="px-4 py-3 space-y-2 max-h-[80vh] overflow-y-auto">
+              {userData?.airport && (
+                <div className="mb-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-lg text-sm font-medium text-center">
+                  {userData.airport.city} - {userData.airport.code}
+                </div>
+              )}
+              <a
+                href="#creation"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Creation
+              </a>
+              <a
+                href="#dashboard"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Advance
+              </a>
+              <a
+                href="#flights"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Scheduled
+              </a>
+              <a
+                href="#flights"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Non-Scheduled
+              </a>
+              <a
+                href="#MIS"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                MIS
+              </a>
+              <a
+                href="#reports"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Reports
+              </a>
+              <a
+                href="#ticket-history"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                Ticket History
+              </a>
+              <a
+                href="#gse"
+                className="block py-2 px-4 rounded-lg hover:bg-sky-50 text-slate-600 font-medium"
+              >
+                GSE
+              </a>
+
+              {isLoggedIn && (
+                <div className="pt-2 border-t border-slate-200">
+                  <div className="mb-2 px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg font-medium text-center">
+                    {userData?.user}
+                  </div>
+                </div>
+              )}
+
+              {isLoggedIn ? (
+                <button
+                  className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-red-500 to-pink-600 text-white font-medium shadow-lg"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </button>
+              ) : (
+                <button
+                  className="w-full py-2 px-4 rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 text-white font-medium shadow-lg"
+                  onClick={handleLoginClick}
+                >
+                  Login
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
+        <style jsx>{`
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+        `}</style>
+      </nav>
       <main className="pt-20 px-4 sm:px-6 lg:px-8 pb-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-6">
@@ -3701,6 +3700,8 @@ const Home = () => {
         }
       `}</style>
       {/* Add this at the end of your component, before the closing </div> */}
+      {/* <AirportLogin /> */}
+
       <footer className="bg-white py-4 mt-8 border-t border-gray-200">
         <div className="container mx-auto px-6">
           <div className="text-center">
